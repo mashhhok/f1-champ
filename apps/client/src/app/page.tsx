@@ -61,7 +61,7 @@ export default function Index() {
                   textAlign: 'center'
                 }}
               >
-                World Champions by Season
+                World Champions by Season!
               </Typography>
               <SeasonsContainer />
             </Box>
