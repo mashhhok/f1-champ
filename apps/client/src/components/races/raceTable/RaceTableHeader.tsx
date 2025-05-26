@@ -1,0 +1,33 @@
+import { TableHead, TableRow, TableCell, useTheme } from "@mui/material";
+import { TableColumn } from "../types";
+import { getStyles } from '../styles';
+
+interface RaceTableHeaderProps {
+  columns: TableColumn[];
+}
+
+const RaceTableHeader = ({ columns }: RaceTableHeaderProps) => {
+  const theme = useTheme();
+  const styles = getStyles(theme);
+
+  return (
+    <TableHead sx={styles.tableHead}>
+      <TableRow>
+        {columns.map((column) => (
+          <TableCell 
+            key={column.id}
+            sx={{ 
+              ...styles.headerCell,
+              ...(column.hideOnXs && { display: { xs: 'none', sm: 'table-cell' } }),
+              ...(column.hideOnSm && { display: { xs: 'none', md: 'table-cell' } })
+            }}
+          >
+            {column.label}
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+  );
+};
+
+export default RaceTableHeader; 

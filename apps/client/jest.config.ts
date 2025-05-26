@@ -7,4 +7,12 @@ export default {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: 'test-output/jest/coverage',
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: [
+    '<rootDir>/tests/jest.setup.ts',
+    '<rootDir>/global.d.ts'
+  ],
+  testMatch: [
+    '**/?(*.)+(test).[jt]s?(x)'
+  ],
 };
