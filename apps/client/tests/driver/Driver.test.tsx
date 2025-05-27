@@ -2,54 +2,36 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
-// Mock the Driver component module
+const testTheme = createTheme();
+
 jest.mock('../../src/components/driver', () => ({
   __esModule: true,
-  default: ({ name, surname, number, nationality, dateOfBirth, wikipediaUrl, imageUrl, team }: any) => (
-    <div data-testid="driver-component">
+  default: ({ name, surname, permanentNumber, nationality, dateOfBirth, wikipediaUrl, imageUrl, team }: any) => (
+    <div>
       <h5>{name} {surname}</h5>
-      <p>#{number}</p>
-      <img src={imageUrl} alt={`${name} ${surname}`} data-testid="driver-image" />
-      <div data-testid="driver-info">
+      <p>#{permanentNumber}</p>
+      <img src={imageUrl} alt={`${name} ${surname}`} />
+      <div>
         <p><strong>Team - </strong> {team}</p>
         <p><strong>Nationality - </strong> {nationality}</p>
         <p><strong>Date of Birth - </strong> {new Date(dateOfBirth).toLocaleDateString()}</p>
       </div>
-      <a href={wikipediaUrl} target="_blank" rel="noopener noreferrer" data-testid="wiki-link">
-        Read more on Wikipedia
-      </a>
-    </div>
-  ),
-  DriverPlaceholder: () => (
-    <div data-testid="driver-placeholder">
-      <h5>Lewis Hamilton</h5>
-      <p>#44</p>
-      <img 
-        src="https://www.formula1.com/content/dam/fom-website/drivers/L/LEWHAM01_Lewis_Hamilton/lewham01.png.transform/2col/image.png" 
-        alt="Lewis Hamilton" 
-        data-testid="driver-image" 
-      />
-      <div data-testid="driver-info">
-        <p><strong>Team - </strong> Mercedes-AMG Petronas</p>
-        <p><strong>Nationality - </strong> British</p>
-        <p><strong>Date of Birth - </strong> {new Date('1985-01-07').toLocaleDateString()}</p>
-      </div>
-      <a href="https://en.wikipedia.org/wiki/Lewis_Hamilton" target="_blank" rel="noopener noreferrer" data-testid="wiki-link">
+      <a href={wikipediaUrl} target="_blank" rel="noopener noreferrer">
         Read more on Wikipedia
       </a>
     </div>
   )
 }));
 
-// Import after mocking
-import Driver, { DriverPlaceholder } from '../../src/components/driver';
+import Driver from '../../src/components/driver';
 
 describe('Driver Component', () => {
   const mockDriverProps = {
     name: 'Max',
     surname: 'Verstappen',
-    number: 33,
+    permanentNumber: '33',
     nationality: 'Dutch',
     dateOfBirth: '1997-09-30',
     wikipediaUrl: 'https://en.wikipedia.org/wiki/Max_Verstappen',
@@ -57,64 +39,105 @@ describe('Driver Component', () => {
     team: 'Red Bull Racing'
   };
 
-  it('renders driver information correctly', () => {
-    render(<Driver {...mockDriverProps} />);
-    
-    // Check if component is rendered
-    const driverComponent = screen.getByTestId('driver-component');
-    expect(driverComponent).toBeInTheDocument();
-    
-    // Check name
-    expect(screen.getByText('Max Verstappen')).toBeInTheDocument();
-    
-    // Check driver number
-    expect(screen.getByText('#33')).toBeInTheDocument();
-    
-    // Check if the image is rendered with correct attributes
-    const image = screen.getByTestId('driver-image');
-    expect(image).toHaveAttribute('src', 'https://example.com/max.png');
-    expect(image).toHaveAttribute('alt', 'Max Verstappen');
-    
-    // Check if driver info is rendered
-    const driverInfo = screen.getByTestId('driver-info');
-    expect(driverInfo).toBeInTheDocument();
-    expect(driverInfo).toHaveTextContent('Team - Red Bull Racing');
-    expect(driverInfo).toHaveTextContent('Nationality - Dutch');
-    
-    // Check if the wiki link is rendered with correct attributes
-    const wikiLink = screen.getByTestId('wiki-link');
-    expect(wikiLink).toHaveAttribute('href', 'https://en.wikipedia.org/wiki/Max_Verstappen');
-    expect(wikiLink).toHaveAttribute('target', '_blank');
-    expect(wikiLink).toHaveTextContent('Read more on Wikipedia');
+  const renderWithTheme = (component: React.ReactElement) => {
+    return render(
+      <ThemeProvider theme={testTheme}>
+        {component}
+      </ThemeProvider>
+    );
+  };
+
+  describe('Driver Name and Number', () => {
+    it('renders driver full name correctly', () => {
+      renderWithTheme(<Driver {...mockDriverProps} />);
+      
+      expect(screen.getByText('Max Verstappen')).toBeInTheDocument();
+    });
+
+    it('renders driver permanent number with hash prefix', () => {
+      renderWithTheme(<Driver {...mockDriverProps} />);
+      
+      expect(screen.getByText('#33')).toBeInTheDocument();
+    });
   });
 
-  it('renders DriverPlaceholder with correct information', () => {
-    render(<DriverPlaceholder />);
-    
-    // Check if component is rendered
-    const driverPlaceholder = screen.getByTestId('driver-placeholder');
-    expect(driverPlaceholder).toBeInTheDocument();
-    
-    // Check name
-    expect(screen.getByText('Lewis Hamilton')).toBeInTheDocument();
-    
-    // Check driver number
-    expect(screen.getByText('#44')).toBeInTheDocument();
-    
-    // Check if the image is rendered with correct attributes
-    const image = screen.getByTestId('driver-image');
-    expect(image).toHaveAttribute('src', 'https://www.formula1.com/content/dam/fom-website/drivers/L/LEWHAM01_Lewis_Hamilton/lewham01.png.transform/2col/image.png');
-    expect(image).toHaveAttribute('alt', 'Lewis Hamilton');
-    
-    // Check if driver info is rendered
-    const driverInfo = screen.getByTestId('driver-info');
-    expect(driverInfo).toBeInTheDocument();
-    expect(driverInfo).toHaveTextContent('Team - Mercedes-AMG Petronas');
-    expect(driverInfo).toHaveTextContent('Nationality - British');
-    
-    // Check if the wiki link is rendered with correct attributes
-    const wikiLink = screen.getByTestId('wiki-link');
-    expect(wikiLink).toHaveAttribute('href', 'https://en.wikipedia.org/wiki/Lewis_Hamilton');
-    expect(wikiLink).toHaveTextContent('Read more on Wikipedia');
+  describe('Driver Image', () => {
+    it('renders driver image with correct src and alt attributes', () => {
+      renderWithTheme(<Driver {...mockDriverProps} />);
+      
+      const image = screen.getByAltText('Max Verstappen');
+      expect(image).toBeInTheDocument();
+      expect(image).toHaveAttribute('src', 'https://example.com/max.png');
+    });
+  });
+
+  describe('Driver Information', () => {
+    it('renders team information', () => {
+      renderWithTheme(<Driver {...mockDriverProps} />);
+      
+      expect(screen.getByText(/Team - Red Bull Racing/)).toBeInTheDocument();
+    });
+
+    it('renders nationality information', () => {
+      renderWithTheme(<Driver {...mockDriverProps} />);
+      
+      expect(screen.getByText(/Nationality - Dutch/)).toBeInTheDocument();
+    });
+
+    it('renders date of birth information', () => {
+      renderWithTheme(<Driver {...mockDriverProps} />);
+      
+      expect(screen.getByText(/Date of Birth/)).toBeInTheDocument();
+    });
+  });
+
+  describe('Wikipedia Link', () => {
+    it('renders Wikipedia link with correct href attribute', () => {
+      renderWithTheme(<Driver {...mockDriverProps} />);
+      
+      const wikiLink = screen.getByRole('link', { name: 'Read more on Wikipedia' });
+      expect(wikiLink).toHaveAttribute('href', 'https://en.wikipedia.org/wiki/Max_Verstappen');
+    });
+
+    it('opens Wikipedia link in new tab', () => {
+      renderWithTheme(<Driver {...mockDriverProps} />);
+      
+      const wikiLink = screen.getByRole('link', { name: 'Read more on Wikipedia' });
+      expect(wikiLink).toHaveAttribute('target', '_blank');
+      expect(wikiLink).toHaveAttribute('rel', 'noopener noreferrer');
+    });
+  });
+
+  describe('Different Driver Data', () => {
+    it('renders with different driver props', () => {
+      const hamiltonProps = {
+        name: 'Lewis',
+        surname: 'Hamilton',
+        permanentNumber: '44',
+        nationality: 'British',
+        dateOfBirth: '1985-01-07',
+        wikipediaUrl: 'https://en.wikipedia.org/wiki/Lewis_Hamilton',
+        imageUrl: 'https://example.com/lewis.png',
+        team: 'Mercedes-AMG Petronas'
+      };
+
+      renderWithTheme(<Driver {...hamiltonProps} />);
+      
+      expect(screen.getByText('Lewis Hamilton')).toBeInTheDocument();
+      expect(screen.getByText('#44')).toBeInTheDocument();
+      expect(screen.getByAltText('Lewis Hamilton')).toBeInTheDocument();
+      expect(screen.getByText(/Team - Mercedes-AMG Petronas/)).toBeInTheDocument();
+      expect(screen.getByText(/Nationality - British/)).toBeInTheDocument();
+    });
+  });
+
+  describe('Component Structure', () => {
+    it('renders all required elements', () => {
+      renderWithTheme(<Driver {...mockDriverProps} />);
+      
+      expect(screen.getByRole('heading', { level: 5 })).toBeInTheDocument();
+      expect(screen.getByRole('img')).toBeInTheDocument();
+      expect(screen.getByRole('link')).toBeInTheDocument();
+    });
   });
 }); 

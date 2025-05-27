@@ -26,45 +26,9 @@ export default function Index() {
             >
               FORMULA 1
             </Typography>
-            <Typography variant="h3" 
-              sx={{ 
-                fontFamily: '"Formula1", sans-serif', 
-                fontWeight: 600,
-                letterSpacing: '0.05em'
-              }}
-            >
-              World Champions
-            </Typography>
           </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 6 }}>
-            <Typography variant="body1" 
-              sx={{ 
-                maxWidth: 800,
-                fontFamily: '"Formula1", sans-serif', 
-                fontWeight: 400
-              }}
-            >
-              Explore the rich history of Formula 1 racing and discover the champions who 
-              have defined the pinnacle of motorsport throughout the decades. From legendary 
-              drivers to iconic teams, this interactive platform brings the excitement and 
-              legacy of Formula 1 to life.
-            </Typography>
-          </Box>
-          
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Box sx={{ width: '100%', maxWidth: 1000 }}>
-              <Typography variant="h5" component="h2" 
-                sx={{ 
-                  fontFamily: '"Formula1", sans-serif', 
-                  fontWeight: 600,
-                  mb: 2,
-                  textAlign: 'center'
-                }}
-              >
-                World Champions by Season!
-              </Typography>
-              <SeasonsContainer />
-            </Box>
+            <SeasonsContainer />
           </Box>
         </Container>
         <Footer />

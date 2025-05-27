@@ -1,4 +1,3 @@
-/// <reference types="@testing-library/jest-dom" />
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -14,10 +13,10 @@ jest.mock('@mui/material', () => {
     useTheme: () => ({
       palette: {
         mode: 'light',
-        primary: { main: '#ff0000' },
-        secondary: { main: '#0000ff' },
-        background: { paper: '#ffffff' },
-        text: { primary: '#000000', secondary: '#333333' },
+        primary: { main: '#E10600' }, // F1_RED
+        secondary: { main: '#1E1E1E' }, // F1_BLACK
+        background: { paper: '#FFFFFF' }, // F1_WHITE
+        text: { primary: '#1E1E1E', secondary: '#B0B0B0' }, // TEXT_PRIMARY_LIGHT, TEXT_SECONDARY_LIGHT
       },
     }),
     Modal: ({ children, open, onClose }: any) => 
@@ -31,20 +30,58 @@ jest.mock('../../src/components/driver', () => {
     __esModule: true,
     default: (props: any) => (
       <article aria-label="Driver profile">
-        <h3>{props.name}</h3>
+        <h3>{props.name} {props.surname}</h3>
         <p>Team: {props.team}</p>
+        <p>Nationality: {props.nationality}</p>
       </article>
     ),
   };
 });
 
-// Mock Redux hooks
+// Mock Redux hooks with dynamic state
+let mockReduxState: {
+  selectedDriver: string | null;
+  isDriverModalOpen: boolean;
+  allRaces: Race[];
+} = {
+  selectedDriver: null,
+  isDriverModalOpen: false,
+  allRaces: []
+};
+
+const mockDispatch = jest.fn();
+const mockSelectDriver = jest.fn((driverName: string) => {
+  mockReduxState.selectedDriver = driverName;
+  mockReduxState.isDriverModalOpen = true;
+});
+
 jest.mock('react-redux', () => ({
-  useDispatch: () => jest.fn(),
-  useSelector: () => ({
-    selectedDriver: null,
-    isDriverModalOpen: false,
-    allRaces: []
+  useDispatch: () => mockDispatch,
+  useSelector: (selector: any) => {
+    if (selector.toString().includes('selectDriverModalState')) {
+      return {
+        isOpen: mockReduxState.isDriverModalOpen,
+        driverInfo: mockReduxState.selectedDriver ? {
+          name: 'Max',
+          surname: 'Verstappen',
+          team: 'Red Bull',
+          nationality: 'Dutch',
+          dateOfBirth: '1997-09-30',
+          wikipediaUrl: 'https://en.wikipedia.org/wiki/Max_Verstappen',
+          permanentNumber: '33'
+        } : null
+      };
+    }
+    return mockReduxState;
+  },
+}));
+
+// Mock useRacesActions hook
+jest.mock('../../src/components/races/hooks', () => ({
+  useRacesActions: () => ({
+    selectDriver: mockSelectDriver,
+    closeModal: jest.fn(),
+    updateAllRaces: jest.fn(),
   }),
 }));
 
@@ -84,6 +121,16 @@ describe('RacesTable', () => {
     },
   ];
 
+  beforeEach(() => {
+    // Reset mock state before each test
+    mockReduxState = {
+      selectedDriver: null,
+      isDriverModalOpen: false,
+      allRaces: mockRaces
+    };
+    jest.clearAllMocks();
+  });
+
   it('renders the table with races data', () => {
     render(<RacesTable races={mockRaces} />);
     
@@ -101,6 +148,20 @@ describe('RacesTable', () => {
     expect(screen.getByText('Mercedes')).toBeInTheDocument();
   });
 
+  it('renders empty table when no races provided', () => {
+    render(<RacesTable races={[]} />);
+    
+    // Check column headers are still present
+    expect(screen.getByText('Grand Prix')).toBeInTheDocument();
+    expect(screen.getByText('Winner')).toBeInTheDocument();
+    expect(screen.getByText('Team')).toBeInTheDocument();
+    expect(screen.getByText('Date')).toBeInTheDocument();
+    
+    // Check no race data is present
+    expect(screen.queryByText('Bahrain Grand Prix')).not.toBeInTheDocument();
+    expect(screen.queryByText('Max Verstappen')).not.toBeInTheDocument();
+  });
+
   it('highlights the season champion with a trophy icon', () => {
     render(<RacesTable races={mockRaces} seasonChampion="Max Verstappen" />);
     
@@ -113,21 +174,15 @@ describe('RacesTable', () => {
     expect(lewisCell).not.toHaveTextContent('🏆');
   });
 
-  it('opens driver modal when clicking on a driver name', () => {
+  it('calls selectDriver when clicking on a driver name', () => {
     render(<RacesTable races={mockRaces} />);
     
-    // Initially, modal should not be present
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    // Click on Max Verstappen's name
+    const driverName = screen.getByText('Max Verstappen');
+    fireEvent.click(driverName);
     
-    // Get all elements with Max Verstappen text in the table
-    const driverCells = screen.getAllByText('Max Verstappen');
-    
-    // Click on the first one (which should be in the table, not the modal)
-    fireEvent.click(driverCells[0]);
-    
-    // Modal should now be visible
-    expect(screen.getByRole('dialog', { name: 'Driver details' })).toBeInTheDocument();
-    expect(screen.getByRole('article', { name: 'Driver profile' })).toBeInTheDocument();
-    expect(screen.getByText('Team: Red Bull Racing')).toBeInTheDocument();
+    // Verify selectDriver was called with the correct driver name
+    expect(mockSelectDriver).toHaveBeenCalledWith('Max Verstappen');
+    expect(mockSelectDriver).toHaveBeenCalledTimes(1);
   });
 }); 

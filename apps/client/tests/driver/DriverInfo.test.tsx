@@ -2,52 +2,82 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import DriverInfo from '../../src/components/driver/DriverInfo';
 
-// We're testing a standalone version of the DriverInfo component
-// We don't need to import the actual Driver component
+const testTheme = createTheme();
 
-// Mock Material UI components
 jest.mock('@mui/material', () => {
   const originalModule = jest.requireActual('@mui/material');
   return {
     __esModule: true,
     ...originalModule,
-    useTheme: () => ({
-      palette: {
-        mode: 'light',
-        primary: { main: '#ff0000' },
-        secondary: { main: '#0000ff' }
-      }
-    }),
+    useTheme: () => testTheme,
     Typography: ({ children, variant, color, sx }: any) => (
-      <p data-testid="driver-info">{children}</p>
+      <p>{children}</p>
     )
   };
 });
 
-// Since DriverInfo is a private component inside Driver.tsx, we need to recreate it for testing
-const DriverInfo = ({ label, value }: { label: string; value: string }) => {
-  return (
-    <p data-testid="driver-info">
-      <strong>{label} - </strong> {value}
-    </p>
-  );
-};
-
 describe('DriverInfo Component', () => {
+  const renderWithTheme = (component: React.ReactElement) => {
+    return render(
+      <ThemeProvider theme={testTheme}>
+        {component}
+      </ThemeProvider>
+    );
+  };
+
   it('renders label and value correctly', () => {
-    render(<DriverInfo label="Team" value="Red Bull Racing" />);
+    renderWithTheme(<DriverInfo label="Team" value="Red Bull Racing" />);
     
-    const infoElement = screen.getByTestId('driver-info');
-    expect(infoElement).toBeInTheDocument();
-    expect(infoElement).toHaveTextContent('Team - Red Bull Racing');
+    expect(screen.getByText(/Team - Red Bull Racing/)).toBeInTheDocument();
   });
 
   it('renders different label and value pairs', () => {
-    render(<DriverInfo label="Nationality" value="Dutch" />);
+    renderWithTheme(<DriverInfo label="Nationality" value="Dutch" />);
     
-    const infoElement = screen.getByTestId('driver-info');
-    expect(infoElement).toBeInTheDocument();
-    expect(infoElement).toHaveTextContent('Nationality - Dutch');
+    expect(screen.getByText(/Nationality - Dutch/)).toBeInTheDocument();
+  });
+
+  it('renders with empty value', () => {
+    renderWithTheme(<DriverInfo label="Team" value="" />);
+    
+    expect(screen.getByText(/Team - /)).toBeInTheDocument();
+  });
+
+  it('renders with special characters in label and value', () => {
+    renderWithTheme(<DriverInfo label="Driver's Age" value="26 years" />);
+    
+    expect(screen.getByText(/Driver's Age - 26 years/)).toBeInTheDocument();
+  });
+
+  it('renders label in bold format', () => {
+    renderWithTheme(<DriverInfo label="Position" value="1st" />);
+    
+    // Check that the label part is wrapped in strong tags
+    const element = screen.getByText(/Position - 1st/);
+    expect(element.querySelector('strong')).toHaveTextContent('Position - ');
+  });
+
+  it('displays the complete formatted text', () => {
+    renderWithTheme(<DriverInfo label="Date of Birth" value="1997-09-30" />);
+    
+    const element = screen.getByText(/Date of Birth - 1997-09-30/);
+    expect(element).toBeInTheDocument();
+    expect(element).toHaveTextContent('Date of Birth - 1997-09-30');
+  });
+
+  it('handles long text values', () => {
+    const longValue = "This is a very long team name that might wrap to multiple lines";
+    renderWithTheme(<DriverInfo label="Team" value={longValue} />);
+    
+    expect(screen.getByText(new RegExp(`Team - ${longValue}`))).toBeInTheDocument();
+  });
+
+  it('handles numeric values as strings', () => {
+    renderWithTheme(<DriverInfo label="Car Number" value="33" />);
+    
+    expect(screen.getByText(/Car Number - 33/)).toBeInTheDocument();
   });
 }); 

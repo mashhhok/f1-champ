@@ -14,22 +14,7 @@ import {
 import { DriverProps } from "./types"
 import f1LogoRed from '../../assets/images/f1_logo_red.svg'
 import { getStyles, formatDate } from './styles';
-
-// Components
-const DriverInfo = ({ label, value }: { label: string; value: string }) => {
-  const theme = useTheme();
-  const styles = getStyles(theme);
-  
-  return (
-    <Typography 
-      variant="body2" 
-      color="text.primary" 
-      sx={styles.infoText}
-    >
-      <strong>{label} - </strong> {value}
-    </Typography>
-  );
-};
+import DriverInfo from './DriverInfo';
 
 const Driver = ({
   name, 
