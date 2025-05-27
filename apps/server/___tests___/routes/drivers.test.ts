@@ -2,7 +2,7 @@ import request from 'supertest';
 import { app } from '../../app';
 import { RaceWinnersService } from '../../services/raceWinnersService';
 import { SeasonChampionsService } from '../../services/seasonChampionsService';
-import { IDriver } from '../../models/Drivers';
+import { IDriver } from '../../models/drivers';
 
 // Mock the services
 jest.mock('../../services/raceWinnersService');

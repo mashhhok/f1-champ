@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { getRaceWinners } from '../../controllers/getRaceWinners';
 import { RaceWinnersService } from '../../services/raceWinnersService';
-import { IDriver } from '../../models/Drivers';
+import { IDriver } from '../../models/drivers';
 
 // Mock the service
 jest.mock('../../services/raceWinnersService');

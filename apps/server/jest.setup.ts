@@ -9,7 +9,7 @@ jest.mock('./utils/redisClient', () => ({
 }));
 
 // Mock Mongoose models
-jest.mock('./models/Drivers', () => ({
+jest.mock('./models/drivers', () => ({
   __esModule: true,
   default: {
     find: jest.fn(),

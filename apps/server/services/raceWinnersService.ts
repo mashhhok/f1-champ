@@ -1,5 +1,5 @@
 import { ApiResponse, RaceResult } from "../controllers/types";
-import Driver, { IDriver } from "../models/Drivers";
+import Driver, { IDriver } from "../models/drivers";
 import { redisClient } from "../utils/redisClient";
 import { fetchWithRetry } from "../utils/fetchRetryFunction";
 

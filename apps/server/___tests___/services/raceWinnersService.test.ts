@@ -1,11 +1,11 @@
 import { RaceWinnersService } from '../../services/raceWinnersService';
 import { redisClient } from '../../utils/redisClient';
-import Driver from '../../models/Drivers';
+import Driver from '../../models/drivers';
 import { fetchWithRetry } from '../../utils/fetchRetryFunction';
 
 // Mock dependencies
 jest.mock('../../utils/redisClient');
-jest.mock('../../models/Drivers');
+jest.mock('../../models/drivers');
 jest.mock('../../utils/fetchRetryFunction');
 
 const mockRedisClient = redisClient as jest.Mocked<typeof redisClient>;
