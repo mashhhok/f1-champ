@@ -1,4 +1,3 @@
-/// <reference types="@testing-library/jest-dom" />
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
@@ -75,13 +74,15 @@ describe('Driver Component', () => {
     it('renders team information', () => {
       renderWithTheme(<Driver {...mockDriverProps} />);
       
-      expect(screen.getByText(/Team - Red Bull Racing/)).toBeInTheDocument();
+      expect(screen.getByText('Team -')).toBeInTheDocument();
+      expect(screen.getByText('Red Bull Racing')).toBeInTheDocument();
     });
 
     it('renders nationality information', () => {
       renderWithTheme(<Driver {...mockDriverProps} />);
       
-      expect(screen.getByText(/Nationality - Dutch/)).toBeInTheDocument();
+      expect(screen.getByText('Nationality -')).toBeInTheDocument();
+      expect(screen.getByText('Dutch')).toBeInTheDocument();
     });
 
     it('renders date of birth information', () => {
@@ -126,8 +127,10 @@ describe('Driver Component', () => {
       expect(screen.getByText('Lewis Hamilton')).toBeInTheDocument();
       expect(screen.getByText('#44')).toBeInTheDocument();
       expect(screen.getByAltText('Lewis Hamilton')).toBeInTheDocument();
-      expect(screen.getByText(/Team - Mercedes-AMG Petronas/)).toBeInTheDocument();
-      expect(screen.getByText(/Nationality - British/)).toBeInTheDocument();
+      expect(screen.getByText('Team -')).toBeInTheDocument();
+      expect(screen.getByText('Mercedes-AMG Petronas')).toBeInTheDocument();
+      expect(screen.getByText('Nationality -')).toBeInTheDocument();
+      expect(screen.getByText('British')).toBeInTheDocument();
     });
   });
 

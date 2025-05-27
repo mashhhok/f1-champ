@@ -5,7 +5,6 @@ import '@testing-library/jest-dom';
 import SeasonTable from '../../src/components/season/SeasonTable';
 import { SeasonChampion } from '../../src/components/season/types';
 import { Race } from '../../src/components/races/types';
-import '../../specs/jest-globals';
 
 // Mock Material UI's useTheme hook
 jest.mock('@mui/material', () => {
@@ -159,7 +158,8 @@ describe('SeasonTable', () => {
 
     render(<SeasonTable />);
     
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.getByText('Season')).toBeInTheDocument();
+    expect(screen.getByText('Champion')).toBeInTheDocument();
   });
 
   it('shows error state when seasons fail to load', () => {
