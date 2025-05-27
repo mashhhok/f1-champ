@@ -10,6 +10,19 @@ const nextConfig = {
   // Use this to set Nx-specific options
   // See: https://nx.dev/recipes/next/next-config-setup
   nx: {},
+  
+  // Enable standalone output for Docker deployment
+  output: 'standalone',
+  
+  // Environment variables
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
+  },
+  
+  // Enable experimental features for better performance
+  experimental: {
+    optimizePackageImports: ['@mui/material', '@mui/icons-material'],
+  },
 };
 
 const plugins = [

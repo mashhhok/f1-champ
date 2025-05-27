@@ -32,6 +32,15 @@ app.use(cors());
 app.use(express.json());
 setupSwagger(app);
 
+// Health check endpoint for Railway
+app.get("/api/health", (req, res) => {
+    res.status(200).json({
+        status: "OK",
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime()
+    });
+});
+
 app.use("/api", driversRouter);
 
 
