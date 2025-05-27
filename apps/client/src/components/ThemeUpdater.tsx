@@ -5,7 +5,7 @@ import { Box } from "@mui/material";
 import { useTheme } from "next-themes";
 import ThemeSwitch from "../styles/ThemeSwitch";
 
-const ThemeUpdater: FC<{}> = () => {
+const ThemeUpdater: FC = () => {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 

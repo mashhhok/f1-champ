@@ -1,8 +1,7 @@
-import axios from "axios";
-import { F1ApiResponse } from "../controllers/types";
-import SeasonWinner, { ISeasonWinner } from "../models/seasonWinner";
-import { fetchWithRetry } from "../utils/fetchRetryFunction";
+import { F1ApiResponse, DriverStanding } from "../controllers/types";
 import { redisClient } from "../utils/redisClient";
+import { fetchWithRetry } from "../utils/fetchRetryFunction";
+import SeasonWinner, { ISeasonWinner } from "../models/seasonWinner";
 
 export class SeasonChampionsService {
   async getSeasonChampions(): Promise<ISeasonWinner[]> {
@@ -69,7 +68,7 @@ export class SeasonChampionsService {
     const standings = data.MRData.StandingsTable.StandingsLists;
     if (!standings || standings.length === 0) return null;
 
-    const driver = standings[0].DriverStandings.find((d) => d.position === "1");
+    const driver = standings[0].DriverStandings.find((d: DriverStanding) => d.position === "1");
     if (!driver) return null;
 
     return {

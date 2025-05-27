@@ -8,8 +8,8 @@ const mockAxios = axios as jest.Mocked<typeof axios>;
 describe('fetchWithRetry', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    jest.spyOn(console, 'warn').mockImplementation(() => {});
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+    jest.spyOn(console, 'error').mockImplementation(() => undefined);
   });
 
   afterEach(() => {

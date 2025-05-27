@@ -1,10 +1,10 @@
 import {Schema, model} from "mongoose";
 
 interface IRace {
-    raceName: string,
-    raceUrl: string,
-    raceDate: string
-}[]
+    raceName: string;
+    raceUrl: string;
+    raceDate: string;
+}
 
 export interface IDriver {
     driverId: string,

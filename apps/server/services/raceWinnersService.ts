@@ -1,4 +1,3 @@
-import axios from "axios";
 import { ApiResponse, RaceResult } from "../controllers/types";
 import Driver, { IDriver } from "../models/Drivers";
 import { redisClient } from "../utils/redisClient";
