@@ -4,17 +4,18 @@ FROM node:20-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy package files first for better caching
-COPY package*.json ./
+# Copy workspace package-lock and server package files first for better caching
+COPY package-lock.json ./
+COPY apps/server/package*.json ./
 
 # Install all dependencies (including devDependencies for TypeScript compilation)
-RUN npm install
+RUN npm install --frozen-lockfile
 
-# Copy TypeScript configuration
-COPY tsconfig.json ./
+# Copy server TypeScript configuration
+COPY apps/server/tsconfig.json ./
 
-# Copy all source code
-COPY . .
+# Copy all server source code
+COPY apps/server/ .
 
 # Compile TypeScript to JavaScript
 RUN npm run build

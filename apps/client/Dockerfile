@@ -6,15 +6,21 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-RUN npm ci
+# Copy workspace package-lock and client package files
+COPY package-lock.json ./
+COPY apps/client/package*.json ./
+RUN npm install --frozen-lockfile
 
 # Rebuild the source code only when needed
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+
+# Copy all client source code
+COPY apps/client/ .
+
+# Copy workspace TypeScript config to the expected path (../../tsconfig.base.json from client dir)
+COPY tsconfig.base.json ../../tsconfig.base.json
 
 # Set environment variables for build
 ENV NODE_ENV=production

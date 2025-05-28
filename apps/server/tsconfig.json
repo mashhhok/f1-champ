@@ -10,5 +10,5 @@
       "resolveJsonModule": true
     },
     "include": ["**/*.ts"],
-    "exclude": ["node_modules", "dist", "coverage", "___tests___", "tests"]
+    "exclude": ["node_modules", "dist", "coverage", "___tests___", "tests", "**/*.test.ts", "**/*.spec.ts", "jest.setup.ts", "jest.config.js"]
 }
