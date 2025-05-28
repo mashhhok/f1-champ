@@ -2,9 +2,7 @@ import { styled } from '@mui/material/styles';
 import Switch, { SwitchProps } from '@mui/material/Switch';
 import {
   F1_RED,
-  F1_WHITE,
-  F1_BLACK,
-  BACKGROUND_DARK
+  F1_WHITE
 } from './colors';
 
 interface MaterialUISwitch extends SwitchProps {

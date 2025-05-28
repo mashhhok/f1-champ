@@ -8,7 +8,7 @@ import { getStyles } from './styles';
 
 const SeasonRow = ({ season, isSelected, onClick }: SeasonRowProps) => {
   const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = getStyles();
   
   return (
     <TableRow 

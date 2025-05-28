@@ -33,9 +33,7 @@ const MUIThemeProvider: FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     if (mounted) {
-      resolvedTheme === "light"
-        ? setCurrentTheme(lightTheme)
-        : setCurrentTheme(darkTheme);
+      setCurrentTheme(resolvedTheme === "light" ? lightTheme : darkTheme);
     }
   }, [resolvedTheme, mounted]);
 

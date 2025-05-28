@@ -8,7 +8,7 @@ interface RaceTableHeaderProps {
 
 const RaceTableHeader = ({ columns }: RaceTableHeaderProps) => {
   const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = getStyles();
 
   return (
     <TableHead sx={styles.tableHead}>

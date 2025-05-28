@@ -1,8 +1,7 @@
 import { F1_RED, F1_WHITE } from "../../styles/colors";
-import { Theme } from "@mui/material";
 
 // Styles for the Races Table component
-export const getStyles = (theme: Theme) => {
+export const getStyles = () => {
   return {
     tableContainer: {
       width: '100%', 

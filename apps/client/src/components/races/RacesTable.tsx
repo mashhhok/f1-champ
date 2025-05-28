@@ -14,7 +14,7 @@ import { RaceTableHeader, RaceTableRow, DriverModal } from './raceTable';
 
 const RacesTable = ({ races, seasonChampion }: RacesTableProps) => {
   const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = getStyles();
 
   return (
     <>

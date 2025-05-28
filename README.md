@@ -1,41 +1,161 @@
-# Client
+# F1 Championship Application
 
 <a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+A full-stack F1 Championship application built with Next.js, Express.js, MongoDB, and Redis.
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/next?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+## 🏎️ Project Overview
 
-## Finish your CI setup
+This is an Nx monorepo containing:
+- **Client**: Next.js frontend application with Material-UI
+- **Server**: Express.js API with MongoDB and Redis integration
+- **Deployment**: Automated deployment to Railway
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/BUU5NAzx0p)
+## 🚀 Quick Start
 
+### Prerequisites
+- Node.js 20+
+- npm or yarn
+- MongoDB (local or Atlas)
+- Redis (local or cloud)
 
-## Run tasks
+### Installation
 
-To run the dev server for your app, use:
+```bash
+# Clone the repository
+git clone <your-repo-url>
+cd f1-champ
 
-```sh
+# Install dependencies
+npm ci --legacy-peer-deps
+```
+
+### Development
+
+```bash
+# Start the server (development mode)
+cd apps/server
+npm run dev
+
+# Start the client (development mode)
 npx nx dev client
+
+# Run tests
+npm test
+npx nx test client
 ```
 
-To create a production bundle:
+### Production Build
 
-```sh
+```bash
+# Build both applications
 npx nx build client
+cd apps/server && npm run start
 ```
 
-To see all available targets to run for a project, run:
+## 📦 Deployment
 
-```sh
+This application is configured for automatic deployment to Railway. See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
+
+### Quick Deploy
+
+```bash
+# Deploy both client and server
+./scripts/deploy.sh
+
+# Deploy only server
+./scripts/deploy.sh server
+
+# Deploy only client
+./scripts/deploy.sh client
+```
+
+### Environment Variables
+
+#### Server (.env)
+```
+NODE_ENV=production
+PORT=4000
+DB_HOST=your-mongodb-connection-string
+REDIS_URL=your-redis-connection-string
+```
+
+#### Client
+```
+NEXT_PUBLIC_API_URL=your-server-url
+```
+
+## 🛠️ Development Commands
+
+```bash
+# Run the dev server for client
+npx nx dev client
+
+# Create a production bundle for client
+npx nx build client
+
+# Run server in development mode
+cd apps/server && npm run dev
+
+# Run tests
+npm test
+npx nx test client
+
+# Lint code
+npx nx lint client
+
+# See all available targets
 npx nx show project client
 ```
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+## 📁 Project Structure
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+```
+f1-champ/
+├── apps/
+│   ├── client/          # Next.js frontend
+│   └── server/          # Express.js API
+├── .github/
+│   └── workflows/       # GitHub Actions for CI/CD
+├── scripts/
+│   └── deploy.sh        # Deployment script
+├── DEPLOYMENT.md        # Deployment guide
+└── README.md
+```
 
-## Add new projects
+## 🔧 Tech Stack
+
+- **Frontend**: Next.js 15, React 19, Material-UI, Redux Toolkit
+- **Backend**: Express.js, TypeScript, MongoDB, Redis
+- **Testing**: Jest, Testing Library
+- **Deployment**: Railway, GitHub Actions
+- **Monorepo**: Nx
+
+## 📚 API Documentation
+
+The server includes Swagger documentation available at `/api-docs` when running in development mode.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+## Nx Workspace Information
+
+✨ Your new, shiny [Nx workspace](https://nx.dev) is ready! ✨
+
+[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/next?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created.
+
+### Add new projects
 
 While you could add new projects to your workspace manually, you might want to leverage [Nx plugins](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) and their [code generation](https://nx.dev/features/generate-code?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) feature.
 
@@ -57,16 +177,13 @@ You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx 
 
 [Learn more about Nx plugins &raquo;](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) | [Browse the plugin registry &raquo;](https://nx.dev/plugin-registry?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
+### Install Nx Console
 
 Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
 
 [Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
 
-## Useful links
+### Useful links
 
 Learn more:
 

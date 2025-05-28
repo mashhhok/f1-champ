@@ -13,7 +13,7 @@ import { getStyles } from './styles';
 
 const SeasonDetails = ({ year, isOpen, races, seasonChampion }: SeasonDetailsProps) => {
   const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = getStyles();
   
   return (
     <TableRow>

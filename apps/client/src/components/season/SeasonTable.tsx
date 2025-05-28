@@ -23,8 +23,7 @@ import { useSelectedYear } from "./hooks/useSelectedYears";
 
 // Components
 const TableHeader = () => {
-  const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = getStyles();
   
   return (
     <TableHead sx={styles.tableHead}>
@@ -38,8 +37,7 @@ const TableHeader = () => {
 
 // Main Component
 const SeasonTable = () => {
-  const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = getStyles();
   const { updateAllRaces } = useRacesActions();
   const { selectedYear, handleSeasonClick } = useSelectedYear();
 
@@ -67,7 +65,7 @@ const SeasonTable = () => {
   
   return (
     <>
-    {isLoadingRaces && <CircularProgress />}
+    {(isLoadingSeasons || isLoadingRaces) && <CircularProgress />}
     {seasonsError && <Alert severity="error">Error loading seasons data</Alert>}
     <TableContainer component={Paper} sx={styles.tableContainer}>
       <Table>

@@ -26,7 +26,7 @@ const Driver = ({
   team
 }: DriverProps) => {
   const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = getStyles();
 
   return (
     <Card sx={styles.card}>

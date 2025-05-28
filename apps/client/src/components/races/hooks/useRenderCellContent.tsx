@@ -20,7 +20,7 @@ export const useRenderCellContent = ({column, race, seasonChampion}: RenderCellC
     const { selectDriver } = useRacesActions();
     const racesState = useSelector(selectRacesState);
     const theme = useTheme();
-    const styles = getStyles(theme);
+    const styles = getStyles();
   
     const handleDriverClick = (driverName: string) => {
         // Ensure races data is available before allowing driver selection

@@ -1,7 +1,6 @@
-import { Theme } from "@mui/material";
 import { F1_RED, getTeamColor } from "../../styles/colors";
 
-export const getStyles = (theme: Theme) => ({
+export const getStyles = () => ({
   card: {
     maxWidth: 345,
     borderRadius: 2,

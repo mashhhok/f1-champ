@@ -11,7 +11,7 @@ interface RaceTableCellProps {
 
 const RaceTableCell = ({ race, column, seasonChampion }: RaceTableCellProps) => {
   const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = getStyles();
 
   const renderCellContent = useRenderCellContent({column, race, seasonChampion});
 

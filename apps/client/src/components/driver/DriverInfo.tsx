@@ -9,7 +9,7 @@ interface DriverInfoProps {
 
 const DriverInfo = ({ label, value }: DriverInfoProps) => {
   const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = getStyles();
   
   return (
     <Typography 

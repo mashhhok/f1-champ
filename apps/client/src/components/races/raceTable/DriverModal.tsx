@@ -9,7 +9,7 @@ import Driver from '../../driver';
 
 const DriverModal = () => {
   const theme = useTheme();
-  const styles = getStyles(theme);
+  const styles = getStyles();
   const { closeModal } = useRacesActions();
   
   // Use memoized selector for better performance

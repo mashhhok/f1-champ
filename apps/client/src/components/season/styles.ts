@@ -1,8 +1,7 @@
-import { Theme } from "@mui/material";
 import { F1_RED, F1_WHITE } from "../../styles/colors";
 
 // Styles for the Season Table component
-export const getStyles = (theme: Theme) => {
+export const getStyles = () => {
   return {
     tableContainer: {
       maxWidth: 1000,

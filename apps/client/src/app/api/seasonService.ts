@@ -5,6 +5,30 @@ import { Race } from '../../components/races/types';
 // The base URL for the API
 const API_BASE_URL = 'http://localhost:4000/api';
 
+// API response interfaces
+interface ChampionApiResponse {
+  season: string;
+  givenName: string;
+  familyName: string;
+}
+
+interface RaceApiResponse {
+  raceName: string;
+  raceUrl: string;
+}
+
+interface DriverApiResponse {
+  driverId: string;
+  givenName: string;
+  familyName: string;
+  teamName: string;
+  teamUrl: string;
+  raceDate: string;
+  laps: number;
+  time: string;
+  race: RaceApiResponse[];
+}
+
 // Service to fetch seasons and race data
 export const seasonService = {
   // Get all season champions
@@ -12,7 +36,7 @@ export const seasonService = {
     try {
       const response = await axios.get(`${API_BASE_URL}/v1/champions`);
       // Map the backend data to match the frontend interface
-      return response.data.map((champion: any) => ({
+      return response.data.map((champion: ChampionApiResponse) => ({
         year: parseInt(champion.season),
         champion: `${champion.givenName} ${champion.familyName}`
       }));
@@ -27,8 +51,8 @@ export const seasonService = {
     try {
       const response = await axios.get(`${API_BASE_URL}/v1/${season}/race-winners`);
       // Map the backend data to match the frontend interface
-      return response.data.map((driver: any) => {
-        return driver.race.map((race: any) => ({
+      return response.data.map((driver: DriverApiResponse) => {
+        return driver.race.map((race: RaceApiResponse) => ({
           id: `${driver.driverId}-${race.raceName}`,
           grandPrix: race.raceName,
           wikipediaUrl: race.raceUrl,
