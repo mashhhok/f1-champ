@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
     "start": "cross-env ts-node ./server.ts",
     "dev": "cross-env nodemon --exec ts-node ./server.ts",
     "test": "jest",
@@ -21,7 +22,10 @@
     "mongoose": "^8.15.0",
     "redis": "^5.1.0",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "typescript": "^5.7.2",
+    "ts-node": "^10.9.1",
+    "@types/node": "^22.15.19"
   },
   "devDependencies": {
     "@types/cors": "^2.8.18",

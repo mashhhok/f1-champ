@@ -2,6 +2,12 @@
   "name": "@client/client",
   "version": "0.0.1",
   "private": true,
+  "scripts": {
+    "build": "next build",
+    "start": "next start",
+    "dev": "next dev",
+    "lint": "next lint"
+  },
   "nx": {
     "name": "client"
   }
