@@ -1,15 +1,15 @@
 'use client';
 
-import { Modal, Box, useTheme, Alert } from "@mui/material";
+import { Modal, Box, Alert } from "@mui/material";
 import { useSelector } from 'react-redux';
 import { selectDriverModalState } from '../../../redux/slices/racesSlice';
 import { useRacesActions } from '../hooks';
 import { getStyles } from '../styles';
+import { useStyles } from '../../../hooks/useStyles';
 import Driver from '../../driver';
 
 const DriverModal = () => {
-  const theme = useTheme();
-  const styles = getStyles();
+  const styles = useStyles(getStyles);
   const { closeModal } = useRacesActions();
   
   // Use memoized selector for better performance

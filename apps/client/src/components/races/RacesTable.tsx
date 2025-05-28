@@ -1,20 +1,17 @@
 'use client';
 
-import { 
-  Table,
+import { Table,
   TableBody,
   TableContainer,
-  Paper,
-  useTheme
-} from "@mui/material";
+  Paper } from "@mui/material";
 import { RacesTableProps } from "./types";
 import { getStyles } from './styles';
+import { useStyles } from '../../hooks/useStyles';
 import { RACE_TABLE_COLUMNS } from './raceTable/tableConfig';
 import { RaceTableHeader, RaceTableRow, DriverModal } from './raceTable';
 
 const RacesTable = ({ races, seasonChampion }: RacesTableProps) => {
-  const theme = useTheme();
-  const styles = getStyles();
+  const styles = useStyles(getStyles);
 
   return (
     <>

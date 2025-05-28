@@ -1,14 +1,13 @@
 import {
   TableRow,
-  TableCell,
-  useTheme
+  TableCell
 } from "@mui/material";
 import { SeasonRowProps } from "./types";
 import { getStyles } from './styles';
+import { useStyles } from '../../hooks/useStyles';
 
 const SeasonRow = ({ season, isSelected, onClick }: SeasonRowProps) => {
-  const theme = useTheme();
-  const styles = getStyles();
+  const styles = useStyles(getStyles);
   
   return (
     <TableRow 

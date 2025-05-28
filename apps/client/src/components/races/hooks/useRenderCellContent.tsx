@@ -1,8 +1,9 @@
 import { formatDate } from "..";
 
-import { Box, Link, useTheme } from "@mui/material";
+import { Box, Link } from "@mui/material";
 import { Race, TableColumn } from "../types";
 import { getStyles } from '../styles';
+import { useStyles } from '../../../hooks/useStyles';
 
 import { useRacesActions } from '../hooks';
 import { useSelector } from 'react-redux';
@@ -19,8 +20,7 @@ interface RenderCellContentProps {
 export const useRenderCellContent = ({column, race, seasonChampion}: RenderCellContentProps) => {
     const { selectDriver } = useRacesActions();
     const racesState = useSelector(selectRacesState);
-    const theme = useTheme();
-    const styles = getStyles();
+    const styles = useStyles(getStyles);
   
     const handleDriverClick = (driverName: string) => {
         // Ensure races data is available before allowing driver selection

@@ -1,6 +1,7 @@
 import React from 'react';
-import { Typography, useTheme } from "@mui/material";
+import { Typography } from "@mui/material";
 import { getStyles } from './styles';
+import { useStyles } from '../../hooks/useStyles';
 
 interface DriverInfoProps {
   label: string;
@@ -8,8 +9,7 @@ interface DriverInfoProps {
 }
 
 const DriverInfo = ({ label, value }: DriverInfoProps) => {
-  const theme = useTheme();
-  const styles = getStyles();
+  const styles = useStyles(getStyles);
   
   return (
     <Typography 

@@ -1,14 +1,14 @@
-import { TableHead, TableRow, TableCell, useTheme } from "@mui/material";
+import { TableHead, TableRow, TableCell } from "@mui/material";
 import { TableColumn } from "../types";
 import { getStyles } from '../styles';
+import { useStyles } from '../../../hooks/useStyles';
 
 interface RaceTableHeaderProps {
   columns: TableColumn[];
 }
 
 const RaceTableHeader = ({ columns }: RaceTableHeaderProps) => {
-  const theme = useTheme();
-  const styles = getStyles();
+  const styles = useStyles(getStyles);
 
   return (
     <TableHead sx={styles.tableHead}>

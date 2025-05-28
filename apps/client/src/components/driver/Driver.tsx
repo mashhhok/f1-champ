@@ -8,13 +8,13 @@ import {
   CardActions,
   Button,
   Typography,
-  Box,
-  useTheme
+  Box
 } from "@mui/material";
 import { DriverProps } from "./types"
 import f1LogoRed from '../../assets/images/f1_logo_red.svg'
 import { getStyles, formatDate } from './styles';
 import DriverInfo from './DriverInfo';
+import { useStyles } from '../../hooks/useStyles';
 
 const Driver = ({
   name, 
@@ -25,8 +25,7 @@ const Driver = ({
   permanentNumber,
   team
 }: DriverProps) => {
-  const theme = useTheme();
-  const styles = getStyles();
+  const styles = useStyles(getStyles);
 
   return (
     <Card sx={styles.card}>

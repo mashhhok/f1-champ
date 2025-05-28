@@ -8,13 +8,13 @@ import {
   TableHead,
   TableRow,
   Paper,
-  useTheme,
   CircularProgress,
   Alert
 } from "@mui/material";
 import { Fragment, useEffect } from "react";
 import { SeasonChampion } from "./types";
 import { getStyles } from './styles';
+import { useStyles } from '../../hooks/useStyles';
 import { useGetSeasonsQuery, useGetRaceWinnersQuery } from "../../redux/f1api/f1api";
 import { useRacesActions } from "../races/hooks";
 import SeasonDetails from "./SeasonDetails";
@@ -23,7 +23,7 @@ import { useSelectedYear } from "./hooks/useSelectedYears";
 
 // Components
 const TableHeader = () => {
-  const styles = getStyles();
+  const styles = useStyles(getStyles);
   
   return (
     <TableHead sx={styles.tableHead}>
@@ -37,7 +37,7 @@ const TableHeader = () => {
 
 // Main Component
 const SeasonTable = () => {
-  const styles = getStyles();
+  const styles = useStyles(getStyles);
   const { updateAllRaces } = useRacesActions();
   const { selectedYear, handleSeasonClick } = useSelectedYear();
 

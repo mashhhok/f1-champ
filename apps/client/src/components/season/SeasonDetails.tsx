@@ -4,16 +4,15 @@ import {
   Typography,
   Box,
   Collapse,
-  useTheme,
   CircularProgress
 } from "@mui/material";
 import RacesTable from "../races/RacesTable";
 import { SeasonDetailsProps } from "./types";
 import { getStyles } from './styles';
+import { useStyles } from '../../hooks/useStyles';
 
 const SeasonDetails = ({ year, isOpen, races, seasonChampion }: SeasonDetailsProps) => {
-  const theme = useTheme();
-  const styles = getStyles();
+  const styles = useStyles(getStyles);
   
   return (
     <TableRow>

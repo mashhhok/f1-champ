@@ -1,7 +1,8 @@
-import { TableCell, useTheme } from "@mui/material";
+import { TableCell } from "@mui/material";
 import { Race, TableColumn } from "../types";
 import { getStyles } from '../styles';
 import { useRenderCellContent } from '../hooks/useRenderCellContent';
+import { useStyles } from '../../../hooks/useStyles';
 
 interface RaceTableCellProps {
   race: Race;
@@ -10,8 +11,7 @@ interface RaceTableCellProps {
 }
 
 const RaceTableCell = ({ race, column, seasonChampion }: RaceTableCellProps) => {
-  const theme = useTheme();
-  const styles = getStyles();
+  const styles = useStyles(getStyles);
 
   const renderCellContent = useRenderCellContent({column, race, seasonChampion});
 
