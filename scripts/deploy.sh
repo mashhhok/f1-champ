@@ -53,9 +53,13 @@ deploy_client() {
     print_status "Deploying client to Railway..."
     cd apps/client
     
+    # Install client dependencies
+    print_status "Installing client dependencies..."
+    npm install
+    
     # Build the application
     print_status "Building client application..."
-    npx nx build client
+    npm run build
     
     # Deploy to Railway
     railway up

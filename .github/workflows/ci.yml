@@ -69,7 +69,10 @@ jobs:
         if: always()
         with:
           name: coverage-reports
-          path: coverage/
+          path: |
+            coverage/
+            **/coverage/
+            **/test-output/jest/coverage/
           retention-days: 30
 
   security:

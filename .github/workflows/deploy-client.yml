@@ -30,11 +30,18 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
+      - name: Install client dependencies
+        run: |
+          cd apps/client
+          npm install
+
       - name: Run tests for client
         run: npx nx test client
 
       - name: Build client
-        run: npx nx build client
+        run: |
+          cd apps/client
+          npm run build
         env:
           NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
 
