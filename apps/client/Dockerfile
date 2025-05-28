@@ -7,13 +7,8 @@ WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-COPY apps/client/package*.json ./apps/client/
 
-# Install root dependencies first
-RUN npm ci --legacy-peer-deps
-
-# Install client-specific dependencies
-WORKDIR /app/apps/client
+# Install dependencies
 RUN npm install
 
 # Rebuild the source code only when needed
@@ -22,22 +17,15 @@ WORKDIR /app
 
 # Copy dependencies
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/client/node_modules ./apps/client/node_modules
-
-# Copy necessary config files
-COPY nx.json ./
-COPY tsconfig.base.json ./
-COPY tsconfig.json ./
 
 # Copy source code
-COPY apps/client ./apps/client
+COPY . .
 
 # Set environment variables for build
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Build the Next.js application
-WORKDIR /app/apps/client
 RUN npm run build
 
 # Production image, copy all the files and run next
@@ -51,9 +39,9 @@ RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
 # Copy the built application
-COPY --from=builder /app/apps/client/.next/standalone ./
-COPY --from=builder /app/apps/client/.next/static ./.next/static
-COPY --from=builder /app/apps/client/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
 
 # Set correct ownership
 RUN chown -R nextjs:nodejs /app
