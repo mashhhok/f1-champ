@@ -2,7 +2,6 @@ import express from "express";
 import { ctrlWrapper } from "../middleware/ctrlWrapper";
 import { getRaceWinners } from "../controllers/getRaceWinners";
 import { getSeasonChampions } from "../controllers/getSeasonChampions";
-import { getSeasonDetails } from "../controllers/getSeasonDetails";
 import { validateSeason } from "../middleware/validation";
 
 export const driversRouter = express.Router();
