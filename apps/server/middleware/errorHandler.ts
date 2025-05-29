@@ -21,9 +21,17 @@ export const errorHandler = (
 
     // Handle non-AppError errors
     if (!(error instanceof AppError)) {
-      const statusCode = error.statusCode || error.status || 500;
+      let statusCode = error.statusCode || error.status || 500;
       const message = error.message || 'Internal Server Error';
-      error = new AppError(message, statusCode, false);
+      
+      // Special handling for CORS errors
+      if (message.includes('CORS')) {
+        statusCode = 403;
+      }
+      
+      // Mark 4xx errors as operational (client errors)
+      const isOperational = statusCode >= 400 && statusCode < 500;
+      error = new AppError(message, statusCode, isOperational);
     }
 
     const appError = error as AppError;

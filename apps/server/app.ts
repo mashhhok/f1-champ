@@ -46,7 +46,10 @@ const corsOptions: cors.CorsOptions = {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      // Create an error with a status property for proper handling
+      const error: any = new Error('Not allowed by CORS');
+      error.status = 403;
+      callback(error);
     }
   },
   credentials: true,

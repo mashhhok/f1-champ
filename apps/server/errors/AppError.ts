@@ -56,3 +56,9 @@ export class ServiceUnavailableError extends AppError {
     super(message, 503, true, 'SERVICE_UNAVAILABLE');
   }
 }
+
+export class CorsError extends AppError {
+  constructor(message: string = 'Not allowed by CORS') {
+    super(message, 403, true, 'CORS_ERROR');
+  }
+}
