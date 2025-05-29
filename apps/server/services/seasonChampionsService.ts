@@ -56,8 +56,12 @@ export class SeasonChampionsService {
     const newChampions = results.filter((item): item is ISeasonWinner => item !== null);
 
     if (newChampions.length > 0) {
-      await SeasonWinner.insertMany(newChampions);
-      newChampions.forEach((champion) => {
+      // Use create instead of insertMany to ensure proper document creation with timestamps
+      const createdChampions = await SeasonWinner.create(newChampions);
+      
+      // Convert to plain objects and update our maps
+      createdChampions.forEach((doc) => {
+        const champion = doc.toObject();
         championsMap[champion.season] = champion;
         redisClient.set(`season:${champion.season}`, JSON.stringify(champion));
       });
