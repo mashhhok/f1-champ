@@ -37,18 +37,20 @@ export class SeasonChampionsService {
 
       const foundYears = new Set(fromDb.map((c) => c.season));
       missingYears = missingYears.filter((year) => !foundYears.has(year.toString()));
+      
+      // Also filter out years that have ended seasons (except current year)
+      const currentYear = new Date().getFullYear();
+      missingYears = missingYears.filter(year => {
+        const yearData = championsMap[year.toString()];
+        // Only re-fetch if: 1) No data exists, or 2) It's current year and season hasn't ended
+        return !yearData || (year === currentYear && !yearData.isSeasonEnded);
+      });
     }
 
     const results = [];
-    for (let i = 0; i < missingYears.length; i++) {
-      const year = missingYears[i];
+    for (const year of missingYears) {
       const champion = await this.fetchChampion(year);
       results.push(champion);
-      
-      // Add a small delay between years to avoid rate limiting
-      if (i < missingYears.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
     }
 
     const newChampions = results.filter((item): item is ISeasonWinner => item !== null);
@@ -77,12 +79,20 @@ export class SeasonChampionsService {
     const standings = data.MRData.StandingsTable.StandingsLists;
     if (!standings || standings.length === 0) return null;
 
-    const seasonDetailsService = new SeasonDetailsService();
-    const numberOfRaces = parseInt(await seasonDetailsService.getNumberOfRaces(year.toString()));
+    const currentYear = new Date().getFullYear();
     const latestRace = parseInt(data.MRData.StandingsTable.round);
-
-    const isSeasonEnded = latestRace < numberOfRaces ? false : true;
-    console.log("latestRace: " + latestRace, "numberOfRaces: " + numberOfRaces, "isSeasonEnded: " + isSeasonEnded, "year: " + year);
+    let isSeasonEnded = true;
+    
+    if (year === currentYear) {
+      // Only fetch number of races for current year where season might be ongoing
+      const seasonDetailsService = new SeasonDetailsService();
+      const numberOfRaces = parseInt(await seasonDetailsService.getNumberOfRaces(year.toString()));
+      isSeasonEnded = latestRace >= numberOfRaces;
+      console.log("latestRace: " + latestRace, "numberOfRaces: " + numberOfRaces, "isSeasonEnded: " + isSeasonEnded, "year: " + year);
+    } else {
+      // For historical data, the season is definitely ended
+      console.log("Historical season - assumed ended. Year: " + year);
+    }
 
     const driver = standings[0].DriverStandings.find((d: DriverStanding) => d.position === "1");
     if (!driver) return null;

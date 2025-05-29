@@ -1,18 +1,25 @@
 import axios from 'axios';
+import { apiRateLimiter } from './rateLimiter';
 
 export async function fetchWithRetry<T>(url: string, retries = 3, initialRetries = 3): Promise<T | null> {
     const MAX_DELAY_429 = 30000; // Maximum 30 seconds for rate limit errors
     const MAX_DELAY_GENERAL = 8000; // Maximum 8 seconds for general errors
     
     try {
+      // Wait if needed based on rate limiter
+      await apiRateLimiter.waitIfNeeded();
+      
       const response = await axios.get<T>(url);
+      apiRateLimiter.onSuccessfulRequest();
       return response.data;
     } catch (error: any) {
       if (error.response?.status === 429 && retries > 0) {
-        // Calculate exponential backoff: 2s, 4s, 8s, 16s...
+        apiRateLimiter.onRateLimitHit();
+        
+        // Calculate exponential backoff: 5s, 10s, 20s...
         const attemptNumber = initialRetries - retries + 1;
-        const baseDelay = Math.pow(2, attemptNumber) * 1000; // 2s, 4s, 8s, 16s...
-        const jitter = Math.random() * 1000; // Add up to 1 second of random jitter
+        const baseDelay = Math.pow(2, attemptNumber) * 2500; // 5s, 10s, 20s...
+        const jitter = Math.random() * 2000; // Add up to 2 seconds of random jitter
         const backoffDelay = Math.min(baseDelay + jitter, MAX_DELAY_429);
         
         console.warn(`Rate limited for ${url}. Retrying in ${Math.round(backoffDelay)}ms (attempt ${attemptNumber}/${initialRetries})...`);
