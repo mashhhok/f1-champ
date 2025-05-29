@@ -1,26 +1,28 @@
 import mongoose from "mongoose";
 import {app} from "./app";
-import { redisClient } from "./utils/redisClient";
-import { DB_HOST, PORT } from "./config/environment";
+import { redisService } from "./utils/redisClient";
+import { environment } from "./config/environment";
 import { scheduleSeasonRefresh } from "./utils/updateSeasonData";
 import { startupDataLoader } from "./services/startupDataLoader";
+import { logger } from "./utils/logger";
 
 mongoose.set("strictQuery", true);
 
-mongoose.connect(DB_HOST)
+mongoose.connect(environment.DB_HOST)
 .then(async ()=>{
-    await redisClient.connect();
-    console.log(`Database connection successful, Redis connected`);
+    await redisService.connect();
+    logger.info(`Database connection successful, Redis connected`);
     
     // Load all data before starting the server
     await startupDataLoader.loadAllData();
     
     // Now start the server
-    app.listen(PORT);
-    scheduleSeasonRefresh();
-    console.log(`Server running on port ${PORT} - Ready to serve requests!`);
+    app.listen(environment.PORT, () => {
+        scheduleSeasonRefresh();
+        logger.info(`Server running on port ${environment.PORT} - Ready to serve requests!`);
+    });
 })
 .catch((err: any)=>{
-    console.log(err.message);
+    logger.error('Failed to start server:', err.message);
     process.exit(1);
 })

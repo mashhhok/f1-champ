@@ -3,11 +3,14 @@ import { redisClient } from "../utils/redisClient";
 import { fetchWithRetry } from "../utils/fetchRetryFunction";
 import SeasonWinner, { ISeasonWinner } from "../models/seasonWinner";
 import { SeasonDetailsService } from "./seasonDetailsService";
+import { logger } from "../utils/logger";
+import { environment } from "../config/environment";
 
 export class SeasonChampionsService {
+  private readonly logger = logger.child({ className: 'SeasonChampionsService' });
   async getSeasonChampions(): Promise<ISeasonWinner[]> {
     const currentYear = new Date().getFullYear();
-    const startYear = 2005;
+    const startYear = environment.START_YEAR || 2005;
     const years = Array.from({ length: currentYear - startYear + 1 }, (_, i) => startYear + i);
 
     const championsMap: Record<string, ISeasonWinner> = {};
@@ -63,7 +66,7 @@ export class SeasonChampionsService {
       createdChampions.forEach((doc) => {
         const champion = doc.toObject();
         championsMap[champion.season] = champion;
-        redisClient.set(`season:${champion.season}`, JSON.stringify(champion));
+        redisClient.setEx(`season:${champion.season}`, environment.CACHE_TTL || 3600, JSON.stringify(champion));
       });
     }
 
@@ -92,10 +95,10 @@ export class SeasonChampionsService {
       const seasonDetailsService = new SeasonDetailsService();
       const numberOfRaces = parseInt(await seasonDetailsService.getNumberOfRaces(year.toString()));
       isSeasonEnded = latestRace >= numberOfRaces;
-      console.log("latestRace: " + latestRace, "numberOfRaces: " + numberOfRaces, "isSeasonEnded: " + isSeasonEnded, "year: " + year);
+      this.logger.info(`Season status check - year: ${year}, latestRace: ${latestRace}, numberOfRaces: ${numberOfRaces}, isSeasonEnded: ${isSeasonEnded}`);
     } else {
       // For historical data, the season is definitely ended
-      console.log("Historical season - assumed ended. Year: " + year);
+      this.logger.debug(`Historical season - assumed ended. Year: ${year}`);
     }
 
     const driver = standings[0].DriverStandings.find((d: DriverStanding) => d.position === "1");

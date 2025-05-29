@@ -1,9 +1,12 @@
+import { logger } from './logger';
+
 export class RateLimiter {
   private lastRequestTime = 0;
   private minDelayBetweenRequests = 2000; // Start with 2 seconds to be safe
   private consecutiveRateLimits = 0;
   private readonly maxDelay = 10000; // Max 10 seconds between requests
   private readonly minDelay = 1500; // Minimum 1.5 seconds between requests
+  private readonly logger = logger.child({ className: 'RateLimiter' });
   
   async waitIfNeeded(): Promise<void> {
     const now = Date.now();
@@ -11,7 +14,7 @@ export class RateLimiter {
     
     if (timeSinceLastRequest < this.minDelayBetweenRequests) {
       const waitTime = this.minDelayBetweenRequests - timeSinceLastRequest;
-      console.log(`Rate limiter: waiting ${waitTime}ms before next request`);
+      this.logger.info(`Rate limiter: waiting ${waitTime}ms before next request`);
       await new Promise(resolve => setTimeout(resolve, waitTime));
     }
     
@@ -25,7 +28,7 @@ export class RateLimiter {
       this.minDelayBetweenRequests * 2,
       this.maxDelay
     );
-    console.log(`Rate limit hit ${this.consecutiveRateLimits} times. Increasing delay to ${this.minDelayBetweenRequests}ms`);
+    this.logger.warn(`Rate limit hit ${this.consecutiveRateLimits} times. Increasing delay to ${this.minDelayBetweenRequests}ms`);
   }
   
   onSuccessfulRequest(): void {
@@ -36,7 +39,7 @@ export class RateLimiter {
         this.minDelay,
         this.minDelayBetweenRequests * 0.8
       );
-      console.log(`Successful request. Decreasing delay to ${this.minDelayBetweenRequests}ms`);
+      this.logger.info(`Successful request. Decreasing delay to ${this.minDelayBetweenRequests}ms`);
     }
   }
 }

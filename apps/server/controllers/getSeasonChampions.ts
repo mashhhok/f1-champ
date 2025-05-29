@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { SeasonChampionsService } from "../services/seasonChampionsService";
 
-export const getSeasonChampions = async (req: Request, res: Response): Promise<void> => {
+export const getSeasonChampions = async (_req: Request, res: Response): Promise<void> => {
     const seasonChampionsService = new SeasonChampionsService();
     const champions = await seasonChampionsService.getSeasonChampions();
     

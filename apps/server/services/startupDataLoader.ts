@@ -1,16 +1,27 @@
 import { SeasonChampionsService } from "./seasonChampionsService";
 import SeasonWinner from "../models/seasonWinner";
 import { redisClient } from "../utils/redisClient";
+import { logger } from "../utils/logger";
+import { environment } from "../config/environment";
 
 export class StartupDataLoader {
   private seasonChampionsService: SeasonChampionsService;
+  private refreshInterval?: NodeJS.Timeout;
+  private isLoading = false;
+  private readonly ONE_HOUR = 60 * 60 * 1000;
 
   constructor() {
     this.seasonChampionsService = new SeasonChampionsService();
   }
 
   async loadAllData(): Promise<void> {
-    console.log("🚀 Starting data initialization...");
+    if (this.isLoading) {
+      logger.warn('Data loading already in progress');
+      return;
+    }
+
+    this.isLoading = true;
+    logger.info('🚀 Starting data initialization...');
     
     try {
       // Check current data state
@@ -26,14 +37,14 @@ export class StartupDataLoader {
         season: { $in: expectedYears }
       }).lean();
 
-      console.log(`📊 Found ${existingData.length}/${expectedYears.length} seasons in MongoDB`);
+      logger.info(`📊 Found ${existingData.length}/${expectedYears.length} seasons in MongoDB`);
 
       // Check if current year data needs refresh (might be incomplete season)
       const currentYearData = existingData.find(d => d.season === currentYear.toString());
       const needsCurrentYearRefresh = !currentYearData || !currentYearData.isSeasonEnded;
 
       if (needsCurrentYearRefresh) {
-        console.log(`🔄 Current year (${currentYear}) needs refresh - season may be ongoing`);
+        logger.info(`🔄 Current year (${currentYear}) needs refresh - season may be ongoing`);
       }
 
       // Load Redis cache from MongoDB first
@@ -41,15 +52,15 @@ export class StartupDataLoader {
 
       // If we're missing any data or need to refresh current year, fetch it
       if (existingData.length < expectedYears.length || needsCurrentYearRefresh) {
-        console.log("🔄 Fetching missing or outdated data from external API...");
+        logger.info("🔄 Fetching missing or outdated data from external API...");
         
         // This will use the existing logic to fetch only missing years
         // and update both MongoDB and Redis
         await this.seasonChampionsService.getSeasonChampions();
         
-        console.log("✅ Data sync completed");
+        logger.info("✅ Data sync completed");
       } else {
-        console.log("✅ All data is up to date");
+        logger.info("✅ All data is up to date");
       }
 
       // Schedule periodic refresh for current season if it's not ended
@@ -58,29 +69,38 @@ export class StartupDataLoader {
       }
 
     } catch (error) {
-      console.error("❌ Error during startup data loading:", error);
+      logger.error("❌ Error during startup data loading:", error);
       // Don't throw - allow server to start even if data loading fails
+      // Retry after 5 minutes
+      setTimeout(() => this.loadAllData(), 5 * 60 * 1000);
+    } finally {
+      this.isLoading = false;
     }
   }
 
   private async warmRedisCache(data: any[]): Promise<void> {
-    console.log(`🔥 Warming Redis cache with ${data.length} seasons...`);
+    logger.info(`🔥 Warming Redis cache with ${data.length} seasons...`);
     
-    const promises = data.map(champion => 
-      redisClient.set(`season:${champion.season}`, JSON.stringify(champion))
-    );
+    const promises = data.map(async (champion) => {
+      try {
+        await redisClient.setEx(`season:${champion.season}`, environment.CACHE_TTL || 3600, JSON.stringify(champion));
+      } catch (error) {
+        logger.error(`Failed to cache season ${champion.season}:`, error);
+      }
+    });
     
     await Promise.all(promises);
-    console.log("✅ Redis cache warmed");
+    logger.info("✅ Redis cache warmed");
   }
 
   private scheduleCurrentSeasonRefresh(): void {
-    // Refresh current season data every hour
-    const ONE_HOUR = 60 * 60 * 1000;
+    // Clear existing interval if any
+    this.cleanup();
     
-    setInterval(async () => {
+    // Refresh current season data every hour
+    this.refreshInterval = setInterval(async () => {
       try {
-        console.log("🔄 Refreshing current season data...");
+        logger.info("🔄 Refreshing current season data...");
         const currentYear = new Date().getFullYear();
         
         // Delete current year from MongoDB to force refresh
@@ -91,15 +111,45 @@ export class StartupDataLoader {
         
         // Fetch fresh data
         await this.seasonChampionsService.getSeasonChampions();
-        
-        console.log("✅ Current season refresh completed");
-      } catch (error) {
-        console.error("❌ Error refreshing current season:", error);
-      }
-    }, ONE_HOUR);
 
-    console.log("⏰ Scheduled hourly refresh for current season");
+        logger.info("✅ Current season refresh completed");
+      } catch (error) {
+        logger.error("❌ Error refreshing current season:", error);
+      }
+    }, this.ONE_HOUR);
+
+    logger.info("⏰ Scheduled hourly refresh for current season");
+  }
+
+  public cleanup(): void {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+      this.refreshInterval = undefined;
+      logger.info('🧹 Cleaned up refresh interval');
+    }
   }
 }
 
-export const startupDataLoader = new StartupDataLoader();
+// Export singleton instance
+let instance: StartupDataLoader | null = null;
+
+export const getStartupDataLoader = (): StartupDataLoader => {
+  if (!instance) {
+    instance = new StartupDataLoader();
+  }
+  return instance;
+};
+
+// For backward compatibility
+export const startupDataLoader = getStartupDataLoader();
+
+// Cleanup on process termination
+process.on('SIGINT', () => {
+  instance?.cleanup();
+  process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+  instance?.cleanup();
+  process.exit(0);
+});

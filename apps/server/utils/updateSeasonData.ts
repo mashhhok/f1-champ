@@ -1,7 +1,8 @@
 import cron from "node-cron";
 import { RaceWinnersService } from "../services/raceWinnersService";
+import { logger } from "./logger";
 
-
+const cronLogger = logger.child({ fileName: 'utils/updateSeasonData.ts' });
 const service = new RaceWinnersService();
 
 const currentYear = new Date().getFullYear();
@@ -14,7 +15,7 @@ export const scheduleSeasonRefresh = () => {
       await service.getRaceWinners(String(currentYear));
 
     } catch (error) {
-      console.error(`${currentYear}:`, error);
+      cronLogger.error(`Failed to refresh season data for ${currentYear}:`, error);
     }
   });
 };

@@ -1,68 +1,32 @@
+import { z } from 'zod';
 import dotenv from 'dotenv';
 
-// Load environment variables
 dotenv.config();
 
-interface EnvironmentConfig {
-    NODE_ENV: string;
-    PORT: number;
-    DB_HOST: string;
-    REDIS_URL: string;
-}
+const envSchema = z.object({
+  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+  PORT: z.string().default('4000').transform(Number),
+  DB_HOST: z.string().url(),
+  REDIS_URL: z.string().optional(),
+  ALLOWED_ORIGINS: z.string().default('http://localhost:3000').transform(val => val.split(',')),
+  API_BASE_URL: z.string().default('https://api.jolpi.ca/ergast/f1/'),
+  LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
+  RATE_LIMIT_WINDOW: z.string().default('900000').transform(Number), // 15 minutes
+  RATE_LIMIT_MAX: z.string().default('100').transform(Number),
+  CACHE_TTL: z.string().default('3600').transform(Number), // 1 hour
+  START_YEAR: z.string().default('2005').transform(Number),
+});
 
-function validateEnvironment(): EnvironmentConfig {
-    const requiredVars = {
-        NODE_ENV: process.env.NODE_ENV || 'development',
-        PORT: process.env.PORT,
-        DB_HOST: process.env.DB_HOST,
-        REDIS_URL: process.env.REDIS_URL,
-    };
+export type Environment = z.infer<typeof envSchema>;
 
-    // Validate NODE_ENV
-    const validNodeEnvs = ['development', 'production', 'test'];
-    if (!validNodeEnvs.includes(requiredVars.NODE_ENV)) {
-        throw new Error(`NODE_ENV must be one of: ${validNodeEnvs.join(', ')}`);
-    }
+const parseEnv = (): Environment => {
+  try {
+    return envSchema.parse(process.env);
+  } catch (error) {
+    // Use console.error here since logger depends on environment being loaded
+    console.error('Invalid environment variables:', error);
+    process.exit(1);
+  }
+};
 
-    // Validate PORT
-    const port = Number(requiredVars.PORT) || 4000;
-    if (isNaN(port) || port <= 0 || port > 65535) {
-        throw new Error('PORT must be a valid number between 1 and 65535');
-    }
-
-    // Validate DB_HOST
-    if (!requiredVars.DB_HOST) {
-        throw new Error('DB_HOST is required');
-    }
-
-    // Validate DB_HOST format (basic MongoDB URL validation)
-    if (!requiredVars.DB_HOST.startsWith('mongodb://') && !requiredVars.DB_HOST.startsWith('mongodb+srv://')) {
-        throw new Error('DB_HOST must be a valid MongoDB connection string');
-    }
-
-    // Set default Redis URL if not provided
-    const redisUrl = requiredVars.REDIS_URL || 'redis://localhost:6379';
-
-    // Validate Redis URL format
-    if (!redisUrl.startsWith('redis://') && !redisUrl.startsWith('rediss://')) {
-        throw new Error('REDIS_URL must be a valid Redis connection string');
-    }
-
-    return {
-        NODE_ENV: requiredVars.NODE_ENV,
-        PORT: port,
-        DB_HOST: requiredVars.DB_HOST,
-        REDIS_URL: redisUrl,
-    };
-}
-
-// Export validated configuration
-export const config = validateEnvironment();
-
-// Export individual values for convenience
-export const {
-    NODE_ENV,
-    PORT,
-    DB_HOST,
-    REDIS_URL,
-} = config; 
+export const environment = parseEnv();
