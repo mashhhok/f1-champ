@@ -80,41 +80,6 @@ const mockSeasons: SeasonChampion[] = [
   { year: 2022, champion: 'Max Verstappen' },
 ];
 
-const mockRaces: Race[] = [
-  { 
-    id: '2023-1',
-    grandPrix: 'Bahrain Grand Prix', 
-    winner: 'Max Verstappen',
-    team: 'Red Bull',
-    teamWikipediaUrl: 'https://en.wikipedia.org/wiki/Red_Bull_Racing',
-    wikipediaUrl: 'https://en.wikipedia.org/wiki/2023_Bahrain_Grand_Prix',
-    date: '2023-03-05',
-    laps: 57,
-    time: '1:33:56.736',
-    driverId: 'max_verstappen',
-    driverNationality: 'Dutch',
-    driverDateOfBirth: '1997-09-30',
-    driverUrl: 'https://en.wikipedia.org/wiki/Max_Verstappen',
-    permanentNumber: '1'
-  },
-  { 
-    id: '2023-2',
-    grandPrix: 'Saudi Arabian Grand Prix', 
-    winner: 'Sergio Perez',
-    team: 'Red Bull',
-    teamWikipediaUrl: 'https://en.wikipedia.org/wiki/Red_Bull_Racing',
-    wikipediaUrl: 'https://en.wikipedia.org/wiki/2023_Saudi_Arabian_Grand_Prix',
-    date: '2023-03-19',
-    laps: 50,
-    time: '1:21:14.894',
-    driverId: 'perez',
-    driverNationality: 'Mexican',
-    driverDateOfBirth: '1990-01-26',
-    driverUrl: 'https://en.wikipedia.org/wiki/Sergio_P%C3%A9rez',
-    permanentNumber: '11'
-  },
-];
-
 describe('SeasonTable', () => {
   const { useGetSeasonsQuery, useGetRaceWinnersQuery } = require('../../src/redux/f1api/f1api');
 

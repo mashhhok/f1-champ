@@ -1,11 +1,10 @@
 /// <reference types="@testing-library/jest-dom" />
 import React from 'react';
-import { renderHook, act } from '@testing-library/react';
+import { renderHook } from '@testing-library/react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { useRenderCellContent } from '../../../src/components/races/hooks/useRenderCellContent';
 import { Race, TableColumn } from '../../../src/components/races/types';
-import { F1_RED, F1_BLACK, F1_WHITE, TEXT_PRIMARY_LIGHT, TEXT_SECONDARY_LIGHT } from '../../../src/styles/colors';
 import '../../jest-globals';
 
 // Mock console.warn to test warning behavior
