@@ -45,6 +45,7 @@ export interface RaceResult {
   export interface F1ApiResponse {
     MRData: {
       StandingsTable: {
+        round: string;
         StandingsLists: Array<{
           DriverStandings: DriverStanding[];
         }>;

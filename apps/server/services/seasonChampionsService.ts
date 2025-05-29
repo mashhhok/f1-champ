@@ -2,6 +2,7 @@ import { F1ApiResponse, DriverStanding } from "../controllers/types";
 import { redisClient } from "../utils/redisClient";
 import { fetchWithRetry } from "../utils/fetchRetryFunction";
 import SeasonWinner, { ISeasonWinner } from "../models/seasonWinner";
+import { SeasonDetailsService } from "./seasonDetailsService";
 
 export class SeasonChampionsService {
   async getSeasonChampions(): Promise<ISeasonWinner[]> {
@@ -68,13 +69,21 @@ export class SeasonChampionsService {
     const standings = data.MRData.StandingsTable.StandingsLists;
     if (!standings || standings.length === 0) return null;
 
+    const seasonDetailsService = new SeasonDetailsService();
+    const numberOfRaces = parseInt(await seasonDetailsService.getNumberOfRaces(year.toString()));
+    const latestRace = parseInt(data.MRData.StandingsTable.round);
+
+    const isSeasonEnded = latestRace < numberOfRaces ? false : true;
+    console.log("latestRace: " + latestRace, "numberOfRaces: " + numberOfRaces, "isSeasonEnded: " + isSeasonEnded);
+
     const driver = standings[0].DriverStandings.find((d: DriverStanding) => d.position === "1");
     if (!driver) return null;
 
     return {
       season: year.toString(),
-      givenName: driver.Driver.givenName,
-      familyName: driver.Driver.familyName,
+      givenName: isSeasonEnded ? driver.Driver.givenName : " ",
+      familyName: isSeasonEnded ? driver.Driver.familyName : " ",
+      isSeasonEnded: isSeasonEnded,
     };
   }
 } 
