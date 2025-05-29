@@ -23,7 +23,7 @@ export class SeasonChampionsService {
       if (champion) championsMap[champion.season] = champion;
     });
 
-    const missingYears = years.filter((year) => !championsMap[year.toString()]);
+    let missingYears = years.filter((year) => !championsMap[year.toString()]);
 
     if (missingYears.length > 0) {
       const fromDb = await SeasonWinner.find({
@@ -36,12 +36,20 @@ export class SeasonChampionsService {
       });
 
       const foundYears = new Set(fromDb.map((c) => c.season));
-      missingYears.filter((year) => !foundYears.has(year.toString()));
+      missingYears = missingYears.filter((year) => !foundYears.has(year.toString()));
     }
 
-    const results = await Promise.all(
-      missingYears.map((year) => this.fetchChampion(year))
-    );
+    const results = [];
+    for (let i = 0; i < missingYears.length; i++) {
+      const year = missingYears[i];
+      const champion = await this.fetchChampion(year);
+      results.push(champion);
+      
+      // Add a small delay between years to avoid rate limiting
+      if (i < missingYears.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
 
     const newChampions = results.filter((item): item is ISeasonWinner => item !== null);
 
@@ -74,7 +82,7 @@ export class SeasonChampionsService {
     const latestRace = parseInt(data.MRData.StandingsTable.round);
 
     const isSeasonEnded = latestRace < numberOfRaces ? false : true;
-    console.log("latestRace: " + latestRace, "numberOfRaces: " + numberOfRaces, "isSeasonEnded: " + isSeasonEnded);
+    console.log("latestRace: " + latestRace, "numberOfRaces: " + numberOfRaces, "isSeasonEnded: " + isSeasonEnded, "year: " + year);
 
     const driver = standings[0].DriverStandings.find((d: DriverStanding) => d.position === "1");
     if (!driver) return null;
