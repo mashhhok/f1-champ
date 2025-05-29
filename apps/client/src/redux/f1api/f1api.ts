@@ -15,8 +15,8 @@ interface RaceResponse {
   race: {
     raceName: string;
     raceUrl: string;
+    raceDate: string;
   }[];
-  raceDate: string;
   season: string;
   givenName: string;
   familyName: string;
@@ -57,7 +57,7 @@ export const f1Api = createApi({
             winner: `${driver.givenName} ${driver.familyName}`,
             team: driver.teamName,
             teamWikipediaUrl: driver.teamUrl,
-            date: driver.raceDate,
+            date: race.raceDate,
             laps: parseInt(driver.laps),
             time: driver.time,
             // Store additional driver info for modal
