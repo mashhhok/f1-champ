@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@types/cors": "^2.8.18",
-    "@types/express": "^5.1.0",
+    "@types/express": "^5.0.2",
     "@types/express-rate-limit": "^5.1.3",
     "@types/mongoose": "^5.11.96",
     "@types/morgan": "^1.9.9",
