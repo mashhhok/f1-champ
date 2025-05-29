@@ -1,0 +1,113 @@
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: f1-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: f1admin
+      MONGO_INITDB_ROOT_PASSWORD: f1password
+      MONGO_INITDB_DATABASE: f1-champions
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - f1-network
+
+  # Redis Cache
+  redis:
+    image: redis:7.2-alpine
+    container_name: f1-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - f1-network
+
+  # F1 Server API
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    container_name: f1-server
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      DB_HOST: mongodb://f1admin:f1password@mongodb:27017/f1-champions?authSource=admin
+      REDIS_URL: redis://redis:6379
+      LOG_LEVEL: debug
+      API_RATE_LIMIT_WINDOW_MS: 60000
+      API_RATE_LIMIT_MAX_REQUESTS: 1000
+    depends_on:
+      - mongodb
+      - redis
+    volumes:
+      - ./apps/server:/app
+      - /app/node_modules
+    networks:
+      - f1-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://server:4000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # F1 Client Frontend
+  client:
+    build:
+      context: .
+      dockerfile: apps/client/Dockerfile
+    container_name: f1-client
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://server:4000/api
+      PORT: 3000
+    depends_on:
+      - server
+    networks:
+      - f1-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://client:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Development Tools (optional)
+  # Redis GUI (optional)
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: f1-redis-commander
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      REDIS_HOSTS: local:redis:6379
+    depends_on:
+      - redis
+    networks:
+      - f1-network
+    profiles:
+      - dev
+
+volumes:
+  mongodb_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  f1-network:
+    driver: bridge
