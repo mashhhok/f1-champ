@@ -42,7 +42,10 @@ app.use('/api/', apiLimiter);
 // CORS configuration
 const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
-    const allowedOrigins = environment.ALLOWED_ORIGINS || ['http://localhost:3000'];
+    const allowedOrigins = environment.ALLOWED_ORIGINS || [
+      'http://localhost:3000',
+      'https://client-production-adf9.up.railway.app'
+    ];
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {

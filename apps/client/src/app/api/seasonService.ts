@@ -1,11 +1,8 @@
 import axios from 'axios';
 import { SeasonChampion } from '../../components/season/types';
 import { Race } from '../../components/races/types';
-import getConfig from 'next/config';
 
-// Get runtime configuration
-const { publicRuntimeConfig } = getConfig() || {};
-const API_BASE_URL = publicRuntimeConfig?.apiUrl || 'http://localhost:4000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 // API response interfaces
 interface ChampionApiResponse {

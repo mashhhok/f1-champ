@@ -1,7 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { SeasonChampion } from '../../components/season/types';
 import { Race } from '../../components/races/types';
-import getConfig from 'next/config';
 
 // Type for the backend champion response
 interface ChampionResponse {
@@ -32,8 +31,7 @@ interface RaceResponse {
 }
 
 // Get runtime configuration
-const { publicRuntimeConfig } = getConfig() || {};
-const API_BASE_URL = publicRuntimeConfig?.apiUrl || 'http://localhost:4000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export const f1Api = createApi({
   reducerPath: 'f1',
@@ -41,7 +39,7 @@ export const f1Api = createApi({
   tagTypes: ['Seasons', 'Races'],
   endpoints: (builder) => ({
     getSeasons: builder.query<SeasonChampion[], void>({ 
-      query: () => '/api/v1/champions',
+      query: () => '/v1/champions',
       providesTags: ['Seasons'],
       transformResponse: (response: ChampionResponse[]) => {
         return response.map(champion => ({
@@ -51,7 +49,7 @@ export const f1Api = createApi({
       }
     }),
     getRaceWinners: builder.query<Race[], number>({
-      query: (season) => `/api/v1/${season}/race-winners`,
+      query: (season) => `/v1/${season}/race-winners`,
       providesTags: ['Races'],
       transformResponse: (response: RaceResponse[]) => {
         return response.flatMap(driver => 
