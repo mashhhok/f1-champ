@@ -4,7 +4,7 @@ import { logger } from './logger';
 
 class RedisService {
   private client: RedisClientType | null = null;
-  private isConnected: boolean = false;
+  private isConnected = false;
 
   async connect(): Promise<void> {
     if (this.client && this.isConnected) {
