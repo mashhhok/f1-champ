@@ -6,7 +6,7 @@ export class AppError extends Error {
   constructor(message: string, statusCode: number, isOperational = true, code?: string) {
     super(message);
     Object.setPrototypeOf(this, new.target.prototype);
-    
+
     this.statusCode = statusCode;
     this.isOperational = isOperational;
     this.code = code;
@@ -28,13 +28,13 @@ export class NotFoundError extends AppError {
 }
 
 export class UnauthorizedError extends AppError {
-  constructor(message: string = 'Unauthorized') {
+  constructor(message = 'Unauthorized') {
     super(message, 401, true, 'UNAUTHORIZED');
   }
 }
 
 export class ForbiddenError extends AppError {
-  constructor(message: string = 'Forbidden') {
+  constructor(message = 'Forbidden') {
     super(message, 403, true, 'FORBIDDEN');
   }
 }
@@ -46,19 +46,19 @@ export class ConflictError extends AppError {
 }
 
 export class InternalServerError extends AppError {
-  constructor(message: string = 'Internal Server Error') {
+  constructor(message = 'Internal Server Error') {
     super(message, 500, false, 'INTERNAL_SERVER_ERROR');
   }
 }
 
 export class ServiceUnavailableError extends AppError {
-  constructor(message: string = 'Service Unavailable') {
+  constructor(message = 'Service Unavailable') {
     super(message, 503, true, 'SERVICE_UNAVAILABLE');
   }
 }
 
 export class CorsError extends AppError {
-  constructor(message: string = 'Not allowed by CORS') {
+  constructor(message = 'Not allowed by CORS') {
     super(message, 403, true, 'CORS_ERROR');
   }
 }

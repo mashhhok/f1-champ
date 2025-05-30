@@ -114,7 +114,7 @@ export const redisClient = {
   set: (key: string, value: string) => redisService.set(key, value),
   setEx: (key: string, seconds: number, value: string) => redisService.setEx(key, seconds, value),
   del: (key: string) => redisService.del(key),
-  on: (_event: string, _handler: Function) => {
+  on: (_event: string, _handler: () => void) => {
     // For backward compatibility - do nothing
   }
 };

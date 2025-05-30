@@ -72,14 +72,13 @@ function getCallerFile(): string {
   let callerfile = '';
   try {
     const err = new Error();
-    let currentfile: string | undefined;
 
     Error.prepareStackTrace = function (err, stack) {
       return stack;
     };
 
     const stack = err.stack as any;
-    currentfile = stack.shift()?.getFileName();
+    const currentfile = stack.shift()?.getFileName();
 
     while (stack.length) {
       callerfile = stack.shift()?.getFileName();
