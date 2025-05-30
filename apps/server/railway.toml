@@ -9,4 +9,5 @@ restartPolicyType = "on_failure"
 [env]
 NODE_ENV = "production"
 PORT = "4000"
+DB_HOST = "mongodb://mongo:HMqEYILwWRUyGxPfOqmRiEknRgWeUDIe@mongodb.railway.internal:27017"
 ALLOWED_ORIGINS = "https://client-production-adf9.up.railway.app,http://localhost:3000" 
