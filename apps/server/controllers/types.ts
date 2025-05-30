@@ -13,7 +13,7 @@ export interface RaceResult {
         url: string;
         dateOfBirth: string;
         nationality: string;
-        permanentNumber: string;
+        permanentNumber?: string;
       };
       Constructor: {
         name: string;
