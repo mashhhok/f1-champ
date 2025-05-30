@@ -2,7 +2,7 @@
 builder = "NIXPACKS"
 
 [build.buildCommand]
-environment = { NEXT_PUBLIC_API_URL = "https://server-production-adf9.up.railway.app" }
+environment = { NEXT_PUBLIC_API_URL = "https://server-production-9fd8.up.railway.app" }
 
 [deploy]
 healthcheckPath = "/"
@@ -12,4 +12,4 @@ restartPolicyType = "on_failure"
 [env]
 NODE_ENV = "production"
 PORT = "3000"
-NEXT_PUBLIC_API_URL = "https://server-production-adf9.up.railway.app"
+NEXT_PUBLIC_API_URL = "https://server-production-9fd8.up.railway.app"
