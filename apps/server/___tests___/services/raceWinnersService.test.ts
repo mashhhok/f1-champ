@@ -107,7 +107,7 @@ describe('RaceWinnersService', () => {
 
       const result = await service.getRaceWinners(season);
 
-      expect(mockFetchWithRetry).toHaveBeenCalledTimes(5); // 5 API calls with different offsets
+      expect(mockFetchWithRetry).toHaveBeenCalledTimes(1);
       expect(mockDriver.insertMany).toHaveBeenCalled();
       expect(mockRedisClient.set).toHaveBeenCalled();
       expect(result).toHaveLength(1);
@@ -120,7 +120,7 @@ describe('RaceWinnersService', () => {
       mockFetchWithRetry.mockResolvedValue(null);
 
       await expect(service.getRaceWinners(season)).rejects.toThrow(
-        `No race winners found for season ${season}`
+        `Failed to fetch race winners for season ${season}`
       );
     });
 
