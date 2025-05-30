@@ -32,6 +32,7 @@ interface DriverApiResponse {
 export const seasonService = {
   // Get all season champions
   getSeasonChampions: async (): Promise<SeasonChampion[]> => {
+    console.log("API_BASE_URL is ", API_BASE_URL);
     try {
       const response = await axios.get(`${API_BASE_URL}/api/v1/champions`);
       // Map the backend data to match the frontend interface
