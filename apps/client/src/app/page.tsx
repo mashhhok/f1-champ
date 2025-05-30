@@ -25,7 +25,7 @@ export default function Index() {
                 mb: 2
               }}
             >
-              FORMULA 1 RACE WINNERS {process.env.NEXT_PUBLIC_API_URL}
+              FORMULA 1
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>

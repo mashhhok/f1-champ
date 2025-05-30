@@ -33,7 +33,7 @@ interface RaceResponse {
 
 // Get runtime configuration
 const { publicRuntimeConfig } = getConfig() || {};
-const API_BASE_URL = publicRuntimeConfig?.apiUrl || process.env.NEXT_PUBLIC_API_URL || 'https://server-production-9fd8.up.railway.app';
+const API_BASE_URL = publicRuntimeConfig?.apiUrl || process.env.NEXT_PUBLIC_API_URL;
 
 export const f1Api = createApi({
   reducerPath: 'f1',
