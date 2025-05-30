@@ -26,7 +26,7 @@ export default function Index() {
                 mb: 2
               }}
             >
-              FORMULA 1
+              FORMULA 1 RACE WINNERS
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
