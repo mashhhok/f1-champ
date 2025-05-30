@@ -76,8 +76,8 @@ jest.mock('../../src/components/season/SeasonDetails', () => {
 
 // Sample test data
 const mockSeasons: SeasonChampion[] = [
-  { year: 2023, champion: 'Max Verstappen' },
-  { year: 2022, champion: 'Max Verstappen' },
+  { year: 2023, champion: 'Max Verstappen', isSeasonEnded: true },
+  { year: 2022, champion: 'Max Verstappen', isSeasonEnded: true },
 ];
 
 describe('SeasonTable', () => {

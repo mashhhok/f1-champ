@@ -4,6 +4,7 @@ import { Race } from '../races/types';
 export interface SeasonChampion {
   year: number;
   champion: string;
+  isSeasonEnded: boolean;
 }
 
 // Interface for SeasonRow component props

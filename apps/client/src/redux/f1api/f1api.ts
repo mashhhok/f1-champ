@@ -8,6 +8,7 @@ interface ChampionResponse {
   season: string;
   givenName: string;
   familyName: string;
+  isSeasonEnded: boolean;
 }
 
 // Type for the backend race response (matches IDriver from backend)
@@ -46,7 +47,8 @@ export const f1Api = createApi({
       transformResponse: (response: ChampionResponse[]) => {
         return response.map(champion => ({
           year: parseInt(champion.season),
-          champion: `${champion.givenName} ${champion.familyName}`
+          champion: `${champion.givenName} ${champion.familyName}`,
+          isSeasonEnded: champion.isSeasonEnded
         }));
       }
     }),

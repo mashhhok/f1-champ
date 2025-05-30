@@ -10,8 +10,8 @@ global.fetch = jest.fn();
 
 // Mock data
 const mockSeasons = [
-  { year: 2023, champion: 'Max Verstappen' },
-  { year: 2022, champion: 'Max Verstappen' },
+  { year: 2023, champion: 'Max Verstappen', isSeasonEnded: true },
+  { year: 2022, champion: 'Max Verstappen', isSeasonEnded: true },
 ];
 
 const mockRaceWinners = [

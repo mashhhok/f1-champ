@@ -16,7 +16,9 @@ const SeasonRow = ({ season, isSelected, onClick }: SeasonRowProps) => {
       sx={styles.seasonRow(isSelected)}
     >
       <TableCell sx={styles.seasonYearCell}>{season.year}</TableCell>
-      <TableCell sx={styles.seasonChampionCell}>{season.champion}</TableCell>
+      <TableCell sx={styles.seasonChampionCell}>
+        {season.isSeasonEnded ? season.champion : "The season hasn't ended yet"}
+      </TableCell>
     </TableRow>
   );
 };
