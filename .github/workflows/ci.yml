@@ -197,3 +197,25 @@ jobs:
           labels: ${{ steps.meta-client.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to Railway
+    runs-on: ubuntu-latest
+    needs: docker
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to Railway
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: |
+          # Install Railway CLI
+          npm install -g @railway/cli
+          
+          # Trigger redeploy for both services
+          echo "Redeploying client service..."
+          railway redeploy --service ${{ secrets.RAILWAY_CLIENT_SERVICE_ID }} --yes
+          
+          echo "Redeploying server service..."
+          railway redeploy --service ${{ secrets.RAILWAY_SERVER_SERVICE_ID }} --yes
+          
+          echo "✅ Deployments triggered successfully!"
