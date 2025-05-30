@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 
 export default function Index() {
 
-  console.log("API_BASE_URL is ", process.env.NEXT_PUBLIC_API_URL);
   return (
     <div>
       <div className="wrapper">
@@ -26,7 +25,7 @@ export default function Index() {
                 mb: 2
               }}
             >
-              FORMULA 1 RACE WINNERS
+              FORMULA 1 RACE WINNERS {process.env.NEXT_PUBLIC_API_URL}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
