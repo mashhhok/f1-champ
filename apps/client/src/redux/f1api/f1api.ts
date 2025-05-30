@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { SeasonChampion } from '../../components/season/types';
 import { Race } from '../../components/races/types';
+import getConfig from 'next/config';
 
 // Type for the backend champion response
 interface ChampionResponse {
@@ -31,7 +32,8 @@ interface RaceResponse {
 }
 
 // Get runtime configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const { publicRuntimeConfig } = getConfig() || {};
+const API_BASE_URL = publicRuntimeConfig?.apiUrl || process.env.NEXT_PUBLIC_API_URL || 'https://server-production-adf9.up.railway.app';
 
 export const f1Api = createApi({
   reducerPath: 'f1',

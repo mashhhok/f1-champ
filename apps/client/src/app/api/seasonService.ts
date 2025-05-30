@@ -2,7 +2,7 @@ import axios from 'axios';
 import { SeasonChampion } from '../../components/season/types';
 import { Race } from '../../components/races/types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://server-production-adf9.up.railway.app';
 
 // API response interfaces
 interface ChampionApiResponse {

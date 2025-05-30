@@ -1,8 +1,10 @@
 [build]
 builder = "NIXPACKS"
 
+[build.buildCommand]
+environment = { NEXT_PUBLIC_API_URL = "https://server-production-adf9.up.railway.app" }
+
 [deploy]
-image = "ghcr.io/mashhhok/f1-champ/client:latest"
 healthcheckPath = "/"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"

@@ -22,9 +22,13 @@ COPY apps/client/ .
 # Copy workspace TypeScript config to the expected path (../../tsconfig.base.json from client dir)
 COPY tsconfig.base.json ../../tsconfig.base.json
 
+# Accept build arguments
+ARG NEXT_PUBLIC_API_URL=https://server-production-adf9.up.railway.app
+
 # Set environment variables for build
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 # Build the application
 RUN npm run build

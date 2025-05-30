@@ -2,7 +2,6 @@
 builder = "NIXPACKS"
 
 [deploy]
-image = "ghcr.io/mashhhok/f1-champ/server:latest"
 healthcheckPath = "/api/health"
 healthcheckTimeout = 100
 restartPolicyType = "on_failure"

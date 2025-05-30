@@ -3,9 +3,12 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   output: 'standalone',
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://server-production-adf9.up.railway.app',
+  },
   publicRuntimeConfig: {
     // Will be available on both server and client
-    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
+    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'https://server-production-adf9.up.railway.app',
   },
 };
 
