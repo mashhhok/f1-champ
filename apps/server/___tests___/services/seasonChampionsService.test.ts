@@ -24,6 +24,12 @@ describe('SeasonChampionsService', () => {
       lean: jest.fn()
     });
     
+    // Mock the create method
+    (mockSeasonWinner.create as jest.Mock) = jest.fn();
+    
+    // Mock Redis methods
+    mockRedisClient.setEx = jest.fn();
+    
     // Mock current year to make tests predictable
     jest.spyOn(Date.prototype, 'getFullYear').mockReturnValue(2007); // Use 2007 to have fewer years to mock
   });
@@ -100,12 +106,26 @@ describe('SeasonChampionsService', () => {
       const mockLean = jest.fn().mockResolvedValue([]);
       (mockSeasonWinner.find as jest.Mock).mockReturnValue({ lean: mockLean });
       mockFetchWithRetry.mockResolvedValue(apiResponse);
-      (mockSeasonWinner.insertMany as jest.Mock).mockResolvedValue([]);
+      
+      // Mock the create method to return documents with toObject method
+      const createdChampion = {
+        season: '2005',
+        givenName: 'Fernando',
+        familyName: 'Alonso',
+        isSeasonEnded: true,
+        toObject: jest.fn().mockReturnValue({
+          season: '2005',
+          givenName: 'Fernando',
+          familyName: 'Alonso',
+          isSeasonEnded: true
+        })
+      };
+      (mockSeasonWinner.create as jest.Mock).mockResolvedValue([createdChampion]);
 
       const result = await service.getSeasonChampions();
 
       expect(mockFetchWithRetry).toHaveBeenCalled();
-      expect(mockSeasonWinner.insertMany).toHaveBeenCalled();
+      expect(mockSeasonWinner.create).toHaveBeenCalled();
       expect(result.length).toBeGreaterThan(0);
     });
 

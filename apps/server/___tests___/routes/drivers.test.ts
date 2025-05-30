@@ -59,7 +59,8 @@ describe('Drivers Routes', () => {
         .get('/api/v1/2023/race-winners')
         .expect(500);
 
-      expect(response.body).toHaveProperty('message');
+      expect(response.body).toHaveProperty('error');
+      expect(response.body.error).toHaveProperty('message');
     });
 
     it('should handle different season formats', async () => {
@@ -115,7 +116,8 @@ describe('Drivers Routes', () => {
         .get('/api/v1/champions')
         .expect(500);
 
-      expect(response.body).toHaveProperty('message');
+      expect(response.body).toHaveProperty('error');
+      expect(response.body.error).toHaveProperty('message');
     });
 
     it('should return empty array when no champions found', async () => {
@@ -139,7 +141,11 @@ describe('Drivers Routes', () => {
         .expect(404);
 
       expect(response.body).toEqual({
-        message: 'Not Found'
+        error: {
+          message: 'Not Found',
+          path: '/api/unknown-route',
+          method: 'GET'
+        }
       });
     });
 
@@ -149,7 +155,11 @@ describe('Drivers Routes', () => {
         .expect(404);
 
       expect(response.body).toEqual({
-        message: 'Not Found'
+        error: {
+          message: 'Not Found',
+          path: '/api/v2/champions',
+          method: 'GET'
+        }
       });
     });
   });
@@ -163,9 +173,11 @@ describe('Drivers Routes', () => {
 
       const response = await request(app)
         .get('/api/v1/champions')
+        .set('Origin', 'http://localhost:3000')
         .expect(200);
 
       expect(response.headers).toHaveProperty('access-control-allow-origin');
+      expect(response.headers['access-control-allow-credentials']).toBe('true');
     });
   });
 

@@ -35,12 +35,14 @@ describe('getSeasonChampions Controller', () => {
       {
         season: '2022',
         givenName: 'Max',
-        familyName: 'Verstappen'
+        familyName: 'Verstappen',
+        isSeasonEnded: true
       },
       {
         season: '2023',
         givenName: 'Max',
-        familyName: 'Verstappen'
+        familyName: 'Verstappen',
+        isSeasonEnded: true
       }
     ];
 

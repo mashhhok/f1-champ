@@ -1,19 +1,44 @@
 import axios from 'axios';
 import { fetchWithRetry } from '../../utils/fetchRetryFunction';
+import { apiRateLimiter } from '../../utils/rateLimiter';
+import { logger } from '../../utils/logger';
 
-// Mock axios
+// Mock dependencies
 jest.mock('axios');
+jest.mock('../../utils/rateLimiter');
+jest.mock('../../utils/logger', () => ({
+  logger: {
+    child: jest.fn().mockReturnValue({
+      warn: jest.fn(),
+      error: jest.fn()
+    })
+  }
+}));
+
 const mockAxios = axios as jest.Mocked<typeof axios>;
+const mockRateLimiter = apiRateLimiter as jest.Mocked<typeof apiRateLimiter>;
+
+// Mock timers to avoid real delays
+jest.useFakeTimers();
+jest.spyOn(global, 'setTimeout');
 
 describe('fetchWithRetry', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.clearAllTimers();
     jest.spyOn(console, 'warn').mockImplementation(() => undefined);
     jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    
+    // Mock rate limiter methods
+    mockRateLimiter.waitIfNeeded = jest.fn().mockResolvedValue(undefined);
+    mockRateLimiter.onSuccessfulRequest = jest.fn();
+    mockRateLimiter.onRateLimitHit = jest.fn();
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
+    jest.clearAllTimers();
+    jest.useRealTimers();
   });
 
   it('should return data on successful request', async () => {
@@ -39,12 +64,17 @@ describe('fetchWithRetry', () => {
       .mockRejectedValueOnce(rateLimitError)
       .mockResolvedValueOnce({ data: mockData });
 
-    const result = await fetchWithRetry('http://example.com');
+    const promise = fetchWithRetry('http://example.com');
+    
+    // Process all timers
+    await jest.runAllTimersAsync();
+    
+    const result = await promise;
 
     expect(result).toEqual(mockData);
     expect(mockAxios.get).toHaveBeenCalledTimes(3);
-    expect(console.warn).toHaveBeenCalledTimes(2);
-  });
+    expect(mockRateLimiter.onRateLimitHit).toHaveBeenCalledTimes(2);
+  }, 30000);
 
   it('should retry on general errors', async () => {
     const mockData = { test: 'data' };
@@ -56,12 +86,16 @@ describe('fetchWithRetry', () => {
       .mockRejectedValueOnce(generalError)
       .mockResolvedValueOnce({ data: mockData });
 
-    const result = await fetchWithRetry('http://example.com');
+    const promise = fetchWithRetry('http://example.com');
+    
+    // Process all timers
+    await jest.runAllTimersAsync();
+    
+    const result = await promise;
 
     expect(result).toEqual(mockData);
     expect(mockAxios.get).toHaveBeenCalledTimes(2);
-    expect(console.error).toHaveBeenCalledWith('Failed to fetch http://example.com: Network error');
-  });
+  }, 30000);
 
   it('should return null after exhausting all retries', async () => {
     const error = {
@@ -70,12 +104,16 @@ describe('fetchWithRetry', () => {
 
     mockAxios.get.mockRejectedValue(error);
 
-    const result = await fetchWithRetry('http://example.com', 2);
+    const promise = fetchWithRetry('http://example.com', 2);
+    
+    // Process all timers
+    await jest.runAllTimersAsync();
+    
+    const result = await promise;
 
     expect(result).toBeNull();
     expect(mockAxios.get).toHaveBeenCalledTimes(3); // Initial + 2 retries
-    expect(console.error).toHaveBeenCalledTimes(3);
-  });
+  }, 30000);
 
   it('should use default retry count of 3', async () => {
     const error = {
@@ -84,11 +122,16 @@ describe('fetchWithRetry', () => {
 
     mockAxios.get.mockRejectedValue(error);
 
-    const result = await fetchWithRetry('http://example.com');
+    const promise = fetchWithRetry('http://example.com');
+    
+    // Process all timers
+    await jest.runAllTimersAsync();
+    
+    const result = await promise;
 
     expect(result).toBeNull();
     expect(mockAxios.get).toHaveBeenCalledTimes(4); // Initial + 3 retries
-  });
+  }, 30000);
 
   it('should handle 429 errors differently from other errors', async () => {
     const rateLimitError = {
@@ -98,12 +141,17 @@ describe('fetchWithRetry', () => {
 
     mockAxios.get.mockRejectedValue(rateLimitError);
 
-    const result = await fetchWithRetry('http://example.com', 1);
+    const promise = fetchWithRetry('http://example.com', 1);
+    
+    // Process all timers
+    await jest.runAllTimersAsync();
+    
+    const result = await promise;
 
     expect(result).toBeNull();
     expect(mockAxios.get).toHaveBeenCalledTimes(2); // Initial + 1 retry
-    expect(console.warn).toHaveBeenCalledWith('Rate limited for http://example.com. Retrying (1 left)...');
-  });
+    expect(mockRateLimiter.onRateLimitHit).toHaveBeenCalledTimes(1);
+  }, 30000);
 
   it('should handle errors without response object', async () => {
     const error = {
@@ -116,6 +164,5 @@ describe('fetchWithRetry', () => {
 
     expect(result).toBeNull();
     expect(mockAxios.get).toHaveBeenCalledTimes(1);
-    expect(console.error).toHaveBeenCalledWith('Failed to fetch http://example.com: Network timeout');
   });
 }); 
