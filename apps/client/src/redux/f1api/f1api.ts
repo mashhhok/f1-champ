@@ -32,11 +32,11 @@ interface RaceResponse {
 
 export const f1Api = createApi({
   reducerPath: 'f1',
-  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:4000/api' }),
+  baseQuery: fetchBaseQuery({ baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api' }),
   tagTypes: ['Seasons', 'Races'],
   endpoints: (builder) => ({
     getSeasons: builder.query<SeasonChampion[], void>({ 
-      query: () => '/v1/champions',
+      query: () => '/api/v1/champions',
       providesTags: ['Seasons'],
       transformResponse: (response: ChampionResponse[]) => {
         return response.map(champion => ({
@@ -46,7 +46,7 @@ export const f1Api = createApi({
       }
     }),
     getRaceWinners: builder.query<Race[], number>({
-      query: (season) => `/v1/${season}/race-winners`,
+      query: (season) => `/api/v1/${season}/race-winners`,
       providesTags: ['Races'],
       transformResponse: (response: RaceResponse[]) => {
         return response.flatMap(driver => 

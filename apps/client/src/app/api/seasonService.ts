@@ -2,8 +2,7 @@ import axios from 'axios';
 import { SeasonChampion } from '../../components/season/types';
 import { Race } from '../../components/races/types';
 
-// The base URL for the API
-const API_BASE_URL = 'http://localhost:4000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 // API response interfaces
 interface ChampionApiResponse {
@@ -34,7 +33,7 @@ export const seasonService = {
   // Get all season champions
   getSeasonChampions: async (): Promise<SeasonChampion[]> => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/v1/champions`);
+      const response = await axios.get(`${API_BASE_URL}/api/v1/champions`);
       // Map the backend data to match the frontend interface
       return response.data.map((champion: ChampionApiResponse) => ({
         year: parseInt(champion.season),
@@ -49,7 +48,7 @@ export const seasonService = {
   // Get race winners for a specific season
   getRaceWinners: async (season: number): Promise<Race[]> => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/v1/${season}/race-winners`);
+      const response = await axios.get(`${API_BASE_URL}/api/v1/${season}/race-winners`);
       // Map the backend data to match the frontend interface
       return response.data.map((driver: DriverApiResponse) => {
         return driver.race.map((race: RaceApiResponse) => ({
