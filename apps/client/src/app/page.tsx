@@ -10,6 +10,8 @@ export const metadata: Metadata = {
 }; 
 
 export default function Index() {
+
+  console.log("API_BASE_URL is ", process.env.NEXT_PUBLIC_API_URL);
   return (
     <div>
       <div className="wrapper">
