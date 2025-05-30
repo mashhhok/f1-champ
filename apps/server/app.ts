@@ -42,21 +42,33 @@ app.use('/api/', apiLimiter);
 // CORS configuration
 const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
-    const allowedOrigins = environment.ALLOWED_ORIGINS || [
-      'http://localhost:3000',
-      'https://client-production-adf9.up.railway.app'
-    ];
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Define allowed origins with fallback
+    let allowedOrigins = environment.ALLOWED_ORIGINS;
+    if (!allowedOrigins || allowedOrigins.length === 0) {
+      allowedOrigins = [
+        'http://localhost:3000',
+        'https://client-production-adf9.up.railway.app'
+      ];
+    }
+    
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    // Check if origin is allowed
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      // Create an error with a status property for proper handling
-      const error: any = new Error('Not allowed by CORS');
+      const error: any = new Error(`CORS: Origin ${origin} not allowed`);
       error.status = 403;
       callback(error);
     }
   },
   credentials: true,
   maxAge: 86400,
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 };
 
 app.use(cors(corsOptions));

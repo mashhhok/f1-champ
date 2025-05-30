@@ -8,7 +8,7 @@ const envSchema = z.object({
   PORT: z.string().default('4000').transform(Number),
   DB_HOST: z.string().url(),
   REDIS_URL: z.string().optional(),
-  ALLOWED_ORIGINS: z.string().default('http://localhost:3000').transform(val => val.split(',')),
+  ALLOWED_ORIGINS: z.string().default('http://localhost:3000').transform(val => val.split(',').map(origin => origin.trim())),
   API_BASE_URL: z.string().default('https://api.jolpi.ca/ergast/f1/'),
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
   RATE_LIMIT_WINDOW: z.string().default('900000').transform(Number), // 15 minutes
