@@ -23,7 +23,7 @@ COPY apps/client/ .
 COPY tsconfig.base.json ../../tsconfig.base.json
 
 # Accept build arguments
-ARG NEXT_PUBLIC_API_URL=https://server-production-adf9.up.railway.app
+ARG NEXT_PUBLIC_API_URL=https://server-production-9fd8.up.railway.app
 
 # Set environment variables for build
 ENV NODE_ENV=production
