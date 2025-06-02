@@ -1,5 +1,6 @@
 import { TableCell } from "@mui/material";
-import { Race, TableColumn } from "../types";
+import { Race } from '@f1-champ/shared-types';
+import { TableColumn } from '../types';
 import { getStyles } from '../styles';
 import { useRenderCellContent } from '../hooks/useRenderCellContent';
 import { useStyles } from '../../../hooks/useStyles';

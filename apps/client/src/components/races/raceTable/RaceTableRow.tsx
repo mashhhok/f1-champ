@@ -1,5 +1,6 @@
 import { TableRow } from "@mui/material";
-import { Race, TableColumn } from "../types";
+import { Race } from '@f1-champ/shared-types';
+import { TableColumn } from '../types';
 import RaceTableCell from "./RaceTableCell";
 
 interface RaceTableRowProps {

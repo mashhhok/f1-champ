@@ -1,4 +1,4 @@
-import { ApiResponse, RaceResult } from "../controllers/types";
+import { F1ApiResponse, RaceResult } from '@f1-champ/shared-types';
 import Driver, { IDriver } from "../models/drivers";
 import { redisClient } from "../utils/redisClient";
 import { fetchWithRetry } from "../utils/fetchRetryFunction";
@@ -20,8 +20,8 @@ export class RaceWinnersService {
 
     const winnersUrl = `https://api.jolpi.ca/ergast/f1/${season}/results/1/`;
     
-    const response = await fetchWithRetry<ApiResponse>(winnersUrl);
-    if (!response) {
+    const response = await fetchWithRetry<F1ApiResponse>(winnersUrl);
+    if (!response?.MRData?.RaceTable?.Races) {
       throw new Error(`Failed to fetch race winners for season ${season}`);
     }
 
@@ -48,15 +48,15 @@ export class RaceWinnersService {
           season: race.season,
           givenName: driver.givenName,
           familyName: driver.familyName,
-          driverUrl: driver.url,
+          driverUrl: driver.url ?? '',
           dateOfBirth: driver.dateOfBirth,
           nationality: driver.nationality,
-          permanentNumber: driver.permanentNumber,
+          permanentNumber: driver.permanentNumber ?? '',
           driverId: driver.driverId,
           teamName: team.name,
-          teamUrl: team.url,
+          teamUrl: team.url ?? '',
           laps: winnerResult.laps,
-          time: winnerResult.Time?.time ?? null,
+          time: winnerResult.Time?.time ?? '',
         };
       } else {
         // Driver has won multiple races in this season

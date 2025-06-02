@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { RaceWinnersService } from "../services/raceWinnersService";
+import { RaceResult, F1ApiResponse } from '@f1-champ/shared-types';
+
 
 export const getRaceWinners = async (
   req: Request,

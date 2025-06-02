@@ -1,28 +1,46 @@
 {
-    "compilerOptions": {
-      "target": "ES2020",
-      "module": "commonjs",
-      "rootDir": "./",
-      "outDir": "./dist",
-      "strict": true,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "resolveJsonModule": true,
-      "forceConsistentCasingInFileNames": true,
-      "noImplicitAny": true,
-      "strictNullChecks": true,
-      "strictFunctionTypes": true,
-      "strictBindCallApply": true,
-      "strictPropertyInitialization": true,
-      "noImplicitThis": true,
-      "alwaysStrict": true,
-      "noUnusedLocals": false,
-      "noUnusedParameters": false,
-      "noImplicitReturns": true,
-      "noFallthroughCasesInSwitch": true,
-      "allowUnusedLabels": false,
-      "allowUnreachableCode": false
-    },
-    "include": ["**/*.ts"],
-    "exclude": ["node_modules", "dist", "coverage", "___tests___", "tests", "**/*.test.ts", "**/*.spec.ts", "jest.setup.ts", "jest.config.js"]
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "rootDir": "./",
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "paths": {
+      "@f1-champ/shared-types": ["../../libs/shared-types/src/index.ts"]
+    }
+  },
+  "include": ["**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "coverage",
+    "___tests___",
+    "tests",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "jest.setup.ts",
+    "jest.config.js"
+  ],
+  "references": [
+    {
+      "path": "../../libs/shared-types"
+    }
+  ]
 }

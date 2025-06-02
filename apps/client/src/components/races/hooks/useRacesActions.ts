@@ -5,7 +5,7 @@ import {
   closeDriverModal, 
   setAllRaces 
 } from '../../../redux/slices/racesSlice';
-import { Race } from '../types';
+import { Race } from '@f1-champ/shared-types';
 
 // Custom hook for races actions - Best Practice for Redux
 export const useRacesActions = () => {

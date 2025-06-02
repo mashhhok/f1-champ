@@ -8,7 +8,8 @@ WORKDIR /app
 
 # Copy workspace package-lock and client package files
 COPY package-lock.json ./
-COPY apps/client/package*.json ./
+COPY package.json ./
+COPY apps/client/package*.json ./apps/client/
 RUN npm install --frozen-lockfile
 
 # Rebuild the source code only when needed
@@ -16,11 +17,14 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 
-# Copy all client source code
-COPY apps/client/ .
+# Copy shared types library
+COPY libs/shared-types ./libs/shared-types
 
-# Copy workspace TypeScript config to the expected path (../../tsconfig.base.json from client dir)
-COPY tsconfig.base.json ../../tsconfig.base.json
+# Copy all client source code
+COPY apps/client/ ./apps/client/
+
+# Copy workspace TypeScript config
+COPY tsconfig.base.json ./tsconfig.base.json
 
 # Accept build arguments
 ARG NEXT_PUBLIC_API_URL=https://server-production-9fd8.up.railway.app
@@ -29,6 +33,9 @@ ARG NEXT_PUBLIC_API_URL=https://server-production-9fd8.up.railway.app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
+# Change to client directory for build
+WORKDIR /app/apps/client
 
 # Build the application
 RUN npm run build
@@ -43,10 +50,11 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy the built application
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
+# Copy the built application and dependencies
+COPY --from=builder /app/apps/client/.next/standalone ./
+COPY --from=builder /app/apps/client/.next/static ./.next/static
+COPY --from=builder /app/apps/client/public ./public
+COPY --from=builder /app/node_modules ./node_modules
 
 USER nextjs
 

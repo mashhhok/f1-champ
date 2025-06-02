@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
-import { Race } from '../../components/races/types';
+import { Race } from '@f1-champ/shared-types';
 import { RootState } from '../store';
 
 export interface RacesState {
