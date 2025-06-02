@@ -2,9 +2,6 @@
 
 <a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
 
-[![CI](https://github.com/your-username/f1-champ/workflows/CI/badge.svg)](https://github.com/your-username/f1-champ/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 A full-stack F1 Championship application built with Next.js, Express.js, MongoDB, and Redis in an Nx monorepo.
 
 ## 🏎️ Project Overview
