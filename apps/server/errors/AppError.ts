@@ -62,3 +62,9 @@ export class CorsError extends AppError {
     super(message, 403, true, 'CORS_ERROR');
   }
 }
+
+export class CacheUnavailableError extends AppError {
+  constructor(message: string) {
+    super(message, 503, true, 'CACHE_UNAVAILABLE');
+  }
+}

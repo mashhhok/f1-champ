@@ -7,7 +7,6 @@ import { logger } from "../utils/logger";
 import { environment } from "../config/environment";
 
 export class SeasonChampionsService {
-  private readonly logger = logger.child({ className: 'SeasonChampionsService' });
   async getSeasonChampions(): Promise<ISeasonWinner[]> {
     const currentYear = new Date().getFullYear();
     const startYear = environment.START_YEAR || 2005;
@@ -95,10 +94,10 @@ export class SeasonChampionsService {
       const seasonDetailsService = new SeasonDetailsService();
       const numberOfRaces = parseInt(await seasonDetailsService.getNumberOfRaces(year.toString()));
       isSeasonEnded = latestRace >= numberOfRaces;
-      this.logger.info(`Season status check - year: ${year}, latestRace: ${latestRace}, numberOfRaces: ${numberOfRaces}, isSeasonEnded: ${isSeasonEnded}`);
+      logger.info(`Season status check - year: ${year}, latestRace: ${latestRace}, numberOfRaces: ${numberOfRaces}, isSeasonEnded: ${isSeasonEnded}`);
     } else {
       // For historical data, the season is definitely ended
-      this.logger.debug(`Historical season - assumed ended. Year: ${year}`);
+      logger.debug(`Historical season - assumed ended. Year: ${year}`);
     }
 
     const driver = standings[0].DriverStandings.find((d: DriverStanding) => d.position === "1");

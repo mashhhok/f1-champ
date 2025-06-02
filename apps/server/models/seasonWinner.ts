@@ -15,6 +15,11 @@ const seasonWinnerSchema = new Schema({
     isSeasonEnded: {type: Boolean, required: true}
 }, {timestamps: true, versionKey: false})
 
+// Add indexes for optimized queries
+seasonWinnerSchema.index({ season: 1 }, { unique: true });
+seasonWinnerSchema.index({ isSeasonEnded: 1 });
+seasonWinnerSchema.index({ season: 1, isSeasonEnded: 1 });
+
 const SeasonWinner = model<ISeasonWinner>("SeasonWinner", seasonWinnerSchema);
 
 export default SeasonWinner;

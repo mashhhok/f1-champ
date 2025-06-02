@@ -42,6 +42,13 @@ const driverSchema = new Schema({
     time: {type: String, required: true},
 }, {timestamps: true, versionKey: false})
 
+// Add indexes for optimized queries
+driverSchema.index({ season: 1, driverId: 1 }, { unique: true });
+driverSchema.index({ season: 1 });
+driverSchema.index({ driverId: 1 });
+driverSchema.index({ 'race.raceDate': 1 });
+driverSchema.index({ teamName: 1 });
+
 const Driver = model<IDriver>("Driver", driverSchema);
 
 export default Driver;
