@@ -11,19 +11,24 @@
 8. [Database Schema](#database-schema)
 9. [Caching Strategy](#caching-strategy)
 10. [Security Architecture](#security-architecture)
-11. [Deployment Architecture](#deployment-architecture)
-12. [Development Workflow](#development-workflow)
+11. [Error Handling & Logging](#error-handling--logging)
+12. [Performance & Monitoring](#performance--monitoring)
+13. [Deployment Architecture](#deployment-architecture)
+14. [Development Workflow](#development-workflow)
+15. [Troubleshooting](#troubleshooting)
 
 ## Overview
 
 F1 Champions is a full-stack web application that displays Formula 1 season champions and race winners. The application is built as a monorepo using Nx workspace, featuring a Next.js frontend and Express.js backend with MongoDB persistence and Redis caching.
 
 ### Key Features
-- Display F1 season champions from 1950 to present
+- Display F1 season champions from 2005 to present
 - Show detailed race winners for each season
 - Real-time data synchronization with external F1 API
 - Multi-layer caching for optimal performance
 - Responsive Material-UI design with dark/light theme support
+- Comprehensive error handling and logging
+- Production-ready security measures
 
 ## System Architecture
 
@@ -33,7 +38,7 @@ F1 Champions is a full-stack web application that displays Formula 1 season cham
 ┌─────────────────────────────────────────────────────────────────┐
 │                          Client (Next.js)                       │
 │  ┌─────────────┐  ┌──────────────┐  ┌─────────────────────┐     │
-│  │   React 19  │  │ Redux Toolkit│  │   Material-UI v7    │     │
+│  │   React 19  │  │ Redux Toolkit│  │   Material-UI       │     │
 │  │ Components  │  │  + RTK Query │  │   + Emotion CSS     │     │
 │  └─────────────┘  └──────────────┘  └─────────────────────┘     │
 └───────────────────────────┬─────────────────────────────────────┘
@@ -42,10 +47,10 @@ F1 Champions is a full-stack web application that displays Formula 1 season cham
 ┌─────────────────────────────────────────────────────────────────┐
 │                      API Gateway (Express.js)                   │
 │  ┌─────────────┐  ┌──────────────┐  ┌─────────────────────┐     │
-│  │   Routes    │  │ Controllers  │  │    Middleware       │     │
-│  │  /api/v1/*  │  │ + Validation │  │ Security/Logging    │     │
+│  │   Routes    │  │ Controllers  │  │  Security Layer     │     │
+│  │  /api/v1/*  │  │ + Validation │  │ Helmet/Rate Limit   │     │
 │  └─────────────┘  └──────────────┘  └─────────────────────┘     │
-└───────────────────────────┬───────────────────────────────────-─┘
+└───────────────────────────┬─────────────────────────────────────┘
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────────────┐
@@ -74,17 +79,17 @@ F1 Champions is a full-stack web application that displays Formula 1 season cham
 
 ### Architectural Patterns
 
-#### 1. **Monorepo Architecture**
+#### 1. **Monorepo Architecture with Nx**
 - Centralized dependency management
 - Shared TypeScript configurations
 - Consistent tooling across projects
 - Optimized builds with Nx caching
 
-#### 2. **Microservices-Ready Design**
-- Clear service boundaries
-- API versioning support
-- Independent deployment capabilities
-- Health check endpoints
+#### 2. **Layered Architecture**
+- Presentation Layer (React Components)
+- API Layer (Express Routes & Controllers)
+- Business Logic Layer (Services)
+- Data Access Layer (Models & Database)
 
 #### 3. **Domain-Driven Design**
 - Feature-based module organization
@@ -94,37 +99,41 @@ F1 Champions is a full-stack web application that displays Formula 1 season cham
 ## Technology Stack
 
 ### Frontend Technologies
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| Next.js | 15.2.4 | React framework with SSR/SSG |
-| React | 19.0.0 | UI library |
-| Redux Toolkit | 2.8.2 | State management |
-| RTK Query | - | Data fetching and caching |
-| Material-UI | 7.2.1 | Component library |
-| Emotion | 13.0.0 | CSS-in-JS styling |
-| TypeScript | 5.7.2 | Type safety |
+| Technology    | Version | Purpose                      |
+|---------------|---------|------------------------------|
+| Next.js       | 15.2.4  | React framework with SSR/SSG |
+| React         | 19.0.0  | UI library                   |
+| Redux Toolkit | 2.8.2   | State management             |
+| RTK Query     | -       | Data fetching and caching    |
+| Material-UI   | 7.1.0   | Component library            |
+| Emotion       | 11.14.0 | CSS-in-JS styling            |
+| TypeScript    | 5.7.2   | Type safety                  |
+| Axios         | 1.9.0   | HTTP client                  |
 
 ### Backend Technologies
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| Express.js | 5.1.0 | Web framework |
-| MongoDB | 8.15.0 | Primary database |
-| Mongoose | 8.3.4 | MongoDB ODM |
-| Redis | 5.1.0 | Caching layer |
-| TypeScript | 5.7.2 | Type safety |
-| Zod | 3.24.1 | Runtime validation |
-| Winston | 3.17.0 | Logging |
-| Swagger | - | API documentation |
+| Technology         | Version | Purpose              |
+|--------------------|---------|----------------------|
+| Express.js         | 5.1.0   | Web framework        |
+| MongoDB            | -       | Primary database     |
+| Mongoose           | 8.15.0  | MongoDB ODM          |
+| Redis              | 5.1.0   | Caching layer        |
+| TypeScript         | 5.7.2   | Type safety          |
+| Zod                | 3.25.36 | Runtime validation   |
+| Winston            | 3.17.0  | Logging              |
+| Helmet             | 8.1.0   | Security headers     |
+| Express Rate Limit | 7.5.0   | Rate limiting        |
+| Morgan             | 1.10.0  | HTTP request logging |
+| Swagger            | 6.2.8   | API documentation    |
 
 ### DevOps & Infrastructure
-| Technology | Purpose |
-|------------|---------|
-| Docker | Containerization |
-| Docker Compose | Local development |
-| Nx | Monorepo management |
-| Jest | Testing framework |
-| ESLint | Code quality |
-| Railway | Deployment platform |
+| Technology     | Version | Purpose              |
+|----------------|---------|----------------------|
+| Docker         |         | Containerization     |
+| Docker Compose |         | Local development    |
+| Nx             | 21.0.3  | Monorepo management  |
+| Jest           | 29.7.0  | Testing framework    |
+| ESLint         | 9.8.0   | Code quality         |
+| Railway        |         | Deployment platform  |
 
 ## Project Structure
 
@@ -134,49 +143,36 @@ f1-champ/
 │   ├── client/                 # Next.js frontend application
 │   │   ├── src/
 │   │   │   ├── app/           # Next.js app router
-│   │   │   ├── components/    # React components
-│   │   │   ├── redux/         # State management
-│   │   │   ├── hooks/         # Custom React hooks
-│   │   │   └── styles/        # Global styles and themes
-│   │   ├── tests/             # Frontend tests
-│   │   └── Dockerfile         # Client container
+│   │   │   │   ├── components/    # React components
+│   │   │   │   ├── redux/         # State management
+│   │   │   │   ├── hooks/         # Custom React hooks
+│   │   │   │   └── styles/        # Global styles and themes
+│   │   │   ├── tests/             # Frontend tests
+│   │   │   ├── public/            # Static assets
+│   │   │   ├── Dockerfile         # Client container
+│   │   │   └── railway.toml       # Railway deployment config
+│   │   ├── server/                # Express.js backend application
+│   │   │   ├── controllers/       # Request handlers
+│   │   │   ├── services/          # Business logic
+│   │   │   ├── models/            # Mongoose schemas
+│   │   │   ├── routes/            # API routes
+│   │   │   ├── middleware/        # Express middleware
+│   │   │   ├── utils/             # Utility functions
+│   │   │   ├── config/            # Configuration files
+│   │   │   ├── errors/            # Error handling
+│   │   │   ├── ___tests___/       # Backend tests
+│   │   │   ├── Dockerfile         # Server container
+│   │   │   └── railway.toml       # Railway deployment config
+│   │   ├── scripts/                   # Deployment and utility scripts
+│   │   └── .github/                   # GitHub workflows
 │   │
-│   └── server/                # Express.js backend application
-│       ├── controllers/       # Request handlers
-│       ├── services/          # Business logic
-│       ├── models/            # Mongoose schemas
-│       ├── routes/            # API routes
-│       ├── middleware/        # Express middleware
-│       ├── utils/             # Utility functions
-│       ├── ___tests___/       # Backend tests
-│       └── Dockerfile         # Server container
+│   └── nx.json                    # Nx workspace configuration
 │
-├── scripts/                   # Deployment and utility scripts
-├── patches/                   # Security and performance patches
-├── nx.json                    # Nx workspace configuration
 ├── docker-compose.yml         # Production compose
 ├── docker-compose.dev.yml     # Development compose
-└── package.json              # Root dependencies
+├── package.json              # Root dependencies
+└── ARCHITECTURE.md           # This file
 ```
-
-### Key Directories Explained
-
-#### Client Structure
-- **`app/`**: Next.js 15 app router with layouts and pages
-- **`components/`**: Feature-based component organization
-  - `season/`: Season-related components
-  - `races/`: Race table and related components
-  - `driver/`: Driver information components
-  - `ui/`: Shared UI components (Header, Footer)
-- **`redux/`**: Redux store configuration and API slices
-- **`hooks/`**: Custom React hooks for shared logic
-
-#### Server Structure
-- **`controllers/`**: HTTP request handlers with validation
-- **`services/`**: Core business logic and external API integration
-- **`models/`**: MongoDB schemas and data models
-- **`middleware/`**: Cross-cutting concerns (auth, errors, logging)
-- **`utils/`**: Shared utilities (logger, redis client, retry logic)
 
 ## Data Flow
 
@@ -192,20 +188,18 @@ f1-champ/
    const { data, isLoading } = useGetRaceWinnersQuery(season);
    ```
 
-3. **API Request**
-   - RTK Query sends HTTP request to backend
-   - Automatic request deduplication and caching
-
-4. **Server-Side Processing**
+3. **API Request Processing**
    ```typescript
-   // Route → Controller → Service flow
+   // Security middleware → Route → Controller → Service flow
+   app.use(helmet()); // Security headers
+   app.use(rateLimit()); // Rate limiting
    router.get('/:season/race-winners', getRaceWinners);
    
    // Controller validates and delegates
    const raceWinners = await raceWinnersService.getRaceWinners(season);
    ```
 
-5. **Multi-Layer Caching Check**
+4. **Multi-Layer Caching Check**
    ```typescript
    // 1. Check Redis cache
    const cached = await redis.get(`race-winners:${season}`);
@@ -218,143 +212,85 @@ f1-champ/
      return stored;
    }
    
-   // 3. Fetch from external API
+   // 3. Fetch from external API with retry logic
    const data = await fetchFromF1API(season);
    ```
 
-6. **Data Persistence**
+5. **Data Persistence & Response**
    - Store in MongoDB for long-term persistence
    - Cache in Redis with TTL for performance
-
-7. **Response Transformation**
-   - Service returns normalized data
-   - Controller sends JSON response
+   - Transform data and send JSON response
    - RTK Query caches and delivers to component
-
-### Data Synchronization
-
-```mermaid
-sequenceDiagram
-    participant C as Client
-    participant S as Server
-    participant R as Redis
-    participant M as MongoDB
-    participant E as External API
-
-    C->>S: GET /api/v1/2023/race-winners
-    S->>R: Check cache
-    alt Cache Hit
-        R-->>S: Return cached data
-        S-->>C: 200 OK (from cache)
-    else Cache Miss
-        S->>M: Query database
-        alt Data Exists
-            M-->>S: Return stored data
-            S->>R: Update cache
-            S-->>C: 200 OK (from DB)
-        else No Data
-            S->>E: Fetch from F1 API
-            E-->>S: Return F1 data
-            S->>M: Store in database
-            S->>R: Cache with TTL
-            S-->>C: 200 OK (from API)
-        end
-    end
-```
 
 ## Key Components
 
 ### Frontend Components
 
 #### 1. **SeasonTable Component**
-Primary component for displaying F1 seasons with champions.
-
 ```typescript
 // apps/client/src/components/season/SeasonTable.tsx
 - Displays all F1 seasons in a paginated table
-- Integrates with RTK Query for data fetching
-- Supports row expansion for race details
 - Material-UI DataGrid integration
+- Row expansion for race details
+- RTK Query data fetching
 ```
 
 #### 2. **RacesTable Component**
-Displays race winners for a selected season.
-
 ```typescript
 // apps/client/src/components/races/RacesTable.tsx
-- Shows all races in a season
+- Shows race winners for selected season
 - Driver modal for detailed information
-- Custom cell renderers for race data
 - Responsive design with mobile support
 ```
 
-#### 3. **Redux Store Configuration**
-Centralized state management with RTK Query.
-
+#### 3. **Redux Store**
 ```typescript
 // apps/client/src/redux/store.ts
 - RTK Query API slice configuration
 - Automatic cache management
-- DevTools integration in development
+- DevTools integration
 ```
 
 ### Backend Services
 
 #### 1. **SeasonChampionsService**
-Core service for managing season champion data.
-
 ```typescript
 // apps/server/services/seasonChampionsService.ts
-Key methods:
 - getSeasonsWithWinners(): Fetch all champions
 - refreshSeasonsData(): Update from external API
 - Multi-layer caching implementation
 ```
 
 #### 2. **RaceWinnersService**
-Manages individual race winner data.
-
 ```typescript
 // apps/server/services/raceWinnersService.ts
-Key methods:
 - getRaceWinners(season): Get races for a season
 - Retry logic for external API calls
 - Data transformation and normalization
 ```
 
-#### 3. **StartupDataLoader**
-Pre-warms cache on server startup.
-
-```typescript
-// apps/server/services/startupDataLoader.ts
-- Loads frequently accessed data
-- Reduces cold start latency
-- Configurable based on environment
-```
-
 ## API Design
 
-### RESTful Endpoints
-
-#### Base URL
+### Base URLs
 ```
-Production: https://api.f1champions.com/api
+Production: https://client-production-adf9.up.railway.app/
 Development: http://localhost:4000/api
 ```
 
-#### Endpoints
+### Core Endpoints
 
-##### 1. **Health Check**
+#### 1. **Health Check**
 ```http
 GET /health
 Response: 200 OK
 {
   "status": "healthy",
+  "uptime": 12345,
   "timestamp": "2024-01-30T12:00:00Z"
 }
 ```
 
-##### 2. **Get All Season Champions**
+#### 2. **Get All Season Champions**
 ```http
 GET /v1/champions
 Response: 200 OK
@@ -364,27 +300,19 @@ Response: 200 OK
     "givenName": "Max",
     "familyName": "Verstappen",
     "isSeasonEnded": true
-  },
-  // ... more seasons
+  }
 ]
 ```
 
-##### 3. **Get Race Winners by Season**
+#### 3. **Get Race Winners by Season**
 ```http
 GET /v1/{season}/race-winners
-Parameters:
-  - season: string (required) - Year of the season
+Parameters: season (string, required)
 Response: 200 OK
 [
   {
     "driverId": "verstappen",
-    "race": [
-      {
-        "raceName": "Bahrain Grand Prix",
-        "date": "2023-03-05",
-        "circuitName": "Bahrain International Circuit"
-      }
-    ],
+    "race": [...],
     "givenName": "Max",
     "familyName": "Verstappen",
     "nationality": "Dutch",
@@ -393,33 +321,23 @@ Response: 200 OK
 ]
 ```
 
-### API Versioning
+### API Features
+- RESTful design principles
 - Version included in URL path (`/v1/`)
-- Backwards compatibility maintained
-- Deprecation notices in headers
-
-### Error Responses
-```typescript
-{
-  "error": {
-    "code": "RESOURCE_NOT_FOUND",
-    "message": "Season data not found",
-    "timestamp": "2024-01-30T12:00:00Z"
-  }
-}
-```
+- Comprehensive error responses
+- Rate limiting (100 requests/15min)
+- Request/response logging
+- Swagger documentation available at `/api-docs`
 
 ## Database Schema
 
 ### MongoDB Collections
 
 #### 1. **seasonWinner Collection**
-Stores F1 season champion data.
-
 ```typescript
 {
   _id: ObjectId,
-  season: String,           // "2023"
+  season: String,           // "2023" (indexed)
   givenName: String,        // "Max"
   familyName: String,       // "Verstappen"
   isSeasonEnded: Boolean,   // true
@@ -428,13 +346,7 @@ Stores F1 season champion data.
 }
 ```
 
-Indexes:
-- `season`: Unique index for fast lookups
-- `createdAt`: For time-based queries
-
 #### 2. **drivers Collection**
-Stores detailed driver and race information.
-
 ```typescript
 {
   _id: ObjectId,
@@ -442,44 +354,35 @@ Stores detailed driver and race information.
   season: String,           // "2023"
   givenName: String,        // "Max"
   familyName: String,       // "Verstappen"
-  dateOfBirth: String,      // "1997-09-30"
   nationality: String,      // "Dutch"
-  permanentNumber: String,  // "1"
-  driverUrl: String,        // Wikipedia URL
   teamName: String,         // "Red Bull"
-  teamUrl: String,          // Team Wikipedia URL
   race: [{
     raceName: String,       // "Bahrain Grand Prix"
     date: String,           // "2023-03-05"
-    circuitName: String,    // "Bahrain International Circuit"
-    circuitUrl: String,     // Circuit Wikipedia URL
-    lat: String,            // Latitude
-    long: String,           // Longitude
-    locality: String,       // "Sakhir"
-    country: String         // "Bahrain"
+    circuitName: String,    // Circuit details
+    // ... more race fields
   }],
-  laps: String,            // Total laps
-  time: String             // Total time
+  // ... additional driver fields
 }
 ```
 
-Indexes:
+**Indexes:**
+- `season`: Unique index
 - `{ season: 1, driverId: 1 }`: Compound index
-- `season`: For season-based queries
+- `createdAt`: Time-based queries
 
 ## Caching Strategy
 
-### Multi-Layer Caching Architecture
+### Multi-Layer Caching
 
-#### 1. **Client-Side Caching (RTK Query)**
+#### 1. **Client-Side (RTK Query)**
 - Automatic request deduplication
 - Configurable cache lifetime
-- Optimistic updates support
-- Cache invalidation on mutations
+- Background refetching
+- Cache invalidation
 
-#### 2. **Redis Caching (Server-Side)**
+#### 2. **Server-Side (Redis)**
 ```typescript
-// Cache configuration
 const CACHE_TTL = {
   SEASON_CHAMPIONS: 3600,    // 1 hour
   RACE_WINNERS: 3600,        // 1 hour
@@ -487,44 +390,27 @@ const CACHE_TTL = {
 };
 
 // Cache key patterns
-`season-champions:all`
-`race-winners:${season}`
-`driver:${driverId}:${season}`
+'season-champions:all'
+'race-winners:${season}'
+'driver:${driverId}:${season}'
 ```
 
-Benefits:
-- Sub-millisecond response times
-- Reduced database load
-- Automatic expiration
-- Cluster support ready
+#### 3. **Database (MongoDB)**
+- Indexed queries for performance
+- Connection pooling
+- Query optimization
 
-#### 3. **MongoDB Persistence**
-- Long-term data storage
-- Complex query support
-- Data integrity guarantees
-- Backup and recovery
-
-### Cache Invalidation Strategy
-
-1. **Time-Based Expiration**
-   - Redis TTL for automatic cleanup
-   - Different TTLs based on data volatility
-
-2. **Event-Based Invalidation**
-   - Clear cache on data updates
-   - Webhook support for external updates
-
-3. **Manual Invalidation**
-   - Admin endpoints for cache clearing
-   - Selective invalidation by key pattern
+### Cache Invalidation
+- Time-based expiration (TTL)
+- Event-based invalidation
+- Manual cache clearing endpoints
 
 ## Security Architecture
 
-### Application Security Measures
+### Application Security
 
-#### 1. **API Security**
+#### 1. **HTTP Security Headers (Helmet)**
 ```typescript
-// Helmet for security headers
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -534,19 +420,12 @@ app.use(helmet({
       imgSrc: ["'self'", "data:", "https:"],
     },
   },
-}));
-
-// CORS configuration
-app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(','),
-  credentials: true,
-  optionsSuccessStatus: 200
+  hsts: { maxAge: 31536000, includeSubDomains: true }
 }));
 ```
 
 #### 2. **Rate Limiting**
 ```typescript
-// Per-IP rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,  // 15 minutes
   max: 100,                   // 100 requests per window
@@ -555,287 +434,296 @@ const limiter = rateLimit({
 });
 ```
 
-#### 3. **Input Validation**
+#### 3. **Input Validation & Sanitization**
 - Zod schemas for runtime validation
-- MongoDB injection prevention
-- SQL injection protection (for future features)
-- XSS prevention through proper encoding
+- Express-mongo-sanitize for NoSQL injection prevention
+- CORS configuration for cross-origin requests
 
-#### 4. **Authentication & Authorization**
-- Currently public API
-- JWT-ready architecture
-- Role-based access control structure
+#### 4. **Environment Security**
+- Environment variables for sensitive data
+- Secure cookie configuration
+- Database connection security
 
-### Data Security
+## Error Handling & Logging
 
-1. **Database Security**
-   - Connection string encryption
-   - Database user permissions
-   - Network isolation in production
+### Error Handling Strategy
 
-2. **Sensitive Data Handling**
-   - Environment variables for secrets
-   - No sensitive data in logs
-   - Secure cookie configuration
+#### 1. **Global Error Handler**
+```typescript
+// apps/server/middleware/errorHandler.ts
+app.use((error, req, res, next) => {
+  logger.error(error.message, { stack: error.stack, url: req.url });
+  res.status(error.status || 500).json({
+    error: {
+      code: error.code || 'INTERNAL_SERVER_ERROR',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    }
+  });
+});
+```
 
-3. **Transport Security**
-   - HTTPS enforcement in production
-   - Secure headers (HSTS, X-Frame-Options)
-   - Certificate pinning ready
+#### 2. **Custom Error Classes**
+```typescript
+class APIError extends Error {
+  constructor(message, statusCode = 500, code = 'API_ERROR') {
+    super(message);
+    this.statusCode = statusCode;
+    this.code = code;
+  }
+}
+```
+
+### Logging Configuration
+
+#### 1. **Winston Logger Setup**
+```typescript
+const logger = winston.createLogger({
+  level: process.env.LOG_LEVEL || 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.errors({ stack: true }),
+    winston.format.json()
+  ),
+  transports: [
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.Console()
+  ]
+});
+```
+
+#### 2. **Request Logging (Morgan)**
+```typescript
+app.use(morgan('combined', {
+  stream: { write: (message) => logger.info(message.trim()) }
+}));
+```
+
+## Performance & Monitoring
+
+### Performance Optimizations
+
+#### 1. **Frontend Optimizations**
+- Next.js automatic code splitting
+- Image optimization
+- Static generation for season data
+- Component lazy loading
+
+#### 2. **Backend Optimizations**
+- Database connection pooling
+- Indexed database queries
+- Redis caching with appropriate TTLs
+- Compression middleware
+
+### Monitoring & Health Checks
+
+#### 1. **Health Endpoint**
+```typescript
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV
+  });
+});
+```
+
+#### 2. **Performance Metrics**
+- Response time tracking
+- Cache hit/miss ratios
+- Error rate monitoring
+- Database query performance
 
 ## Deployment Architecture
 
-### Container Architecture
+### Container Setup
 
-#### 1. **Docker Configuration**
-
-**Client Dockerfile** (Multi-stage build):
+#### 1. **Client Dockerfile**
 ```dockerfile
-# Build stage
 FROM node:22-alpine AS builder
 WORKDIR /app
 COPY . .
-RUN npm ci && npm run build:client
+RUN npm ci && npm run build
 
-# Production stage
 FROM node:22-alpine
 WORKDIR /app
 COPY --from=builder /app/dist/apps/client ./
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
 ```
 
-**Server Dockerfile**:
+#### 2. **Server Dockerfile**
 ```dockerfile
 FROM node:22-alpine
 WORKDIR /app
-COPY dist/apps/server ./
-COPY node_modules ./node_modules
+COPY . .
+RUN npm ci && npm run build
 EXPOSE 4000
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
 ```
 
-#### 2. **Docker Compose Setup**
+### Railway Deployment
 
-**Production** (`docker-compose.yml`):
-```yaml
-services:
-  client:
-    build: ./apps/client
-    ports:
-      - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://server:4000
-    depends_on:
-      - server
+#### 1. **Railway Configuration**
+```toml
+# railway.toml
+[build]
+builder = "nixpacks"
 
-  server:
-    build: ./apps/server
-    ports:
-      - "4000:4000"
-    environment:
-      - DB_HOST=mongodb://mongo:27017/f1db
-      - REDIS_URL=redis://redis:6379
-    depends_on:
-      - mongo
-      - redis
-
-  mongo:
-    image: mongo:7
-    volumes:
-      - mongo_data:/data/db
-
-  redis:
-    image: redis:7-alpine
-    command: redis-server --appendonly yes
-    volumes:
-      - redis_data:/data
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 30
+restartPolicyType = "on-failure"
 ```
 
-### Production Deployment
-
-#### Railway Deployment
-1. **Automatic Deployments**
-   - GitHub integration
-   - Branch-based deployments
-   - Rollback capabilities
-
-2. **Environment Management**
-   - Secure environment variables
-   - Per-environment configuration
-   - Secret rotation support
-
-3. **Scaling Strategy**
-   - Horizontal scaling support
-   - Load balancer ready
-   - Auto-scaling rules
-
-### Monitoring & Observability
-
-1. **Health Checks**
-   ```typescript
-   app.get('/health', (req, res) => {
-     res.json({
-       status: 'healthy',
-       uptime: process.uptime(),
-       timestamp: new Date().toISOString()
-     });
-   });
-   ```
-
-2. **Logging Strategy**
-   - Winston for structured logging
-   - Log levels by environment
-   - Centralized log aggregation ready
-
-3. **Metrics Collection**
-   - Response time tracking
-   - Error rate monitoring
-   - Cache hit/miss ratios
+#### 2. **Environment Variables**
+```
+NODE_ENV=production
+PORT=4000
+MONGODB_URI=mongodb://...
+REDIS_URL=redis://...
+LOG_LEVEL=info
+```
 
 ## Development Workflow
 
 ### Local Development Setup
 
-1. **Prerequisites**
-   ```bash
-   - Node.js 22+
-   - Docker & Docker Compose
-   - MongoDB (via Docker)
-   - Redis (via Docker)
-   ```
+#### 1. **Prerequisites**
+- Node.js 22+
+- Docker & Docker Compose
+- Git
 
-2. **Initial Setup**
-   ```bash
-   # Clone repository
-   git clone https://github.com/yourusername/f1-champ.git
-   cd f1-champ
-
-   # Install dependencies
-   npm install
-
-   # Start infrastructure
-   docker-compose -f docker-compose.dev.yml up -d
-
-   # Run development servers
-   nx run-many --target=dev --projects=client,server --parallel
-   ```
-
-3. **Development URLs**
-   - Frontend: http://localhost:3000
-   - Backend: http://localhost:4000
-   - API Docs: http://localhost:4000/api-docs
-
-### Nx Commands Reference
-
+#### 2. **Setup Commands**
 ```bash
-# Development
+# Clone and setup
+git clone <repository-url>
+cd f1-champ
+npm install
+
+# Start development environment
+docker-compose -f docker-compose.dev.yml up -d
+
+# Run applications
+nx run-many --target=dev --projects=client,server --parallel
+```
+
+#### 3. **Development URLs**
+- Frontend: http://localhost:3000
+- Backend: http://localhost:4000
+
+### Nx Commands
+
+#### Development
+```bash
 nx dev client              # Start client dev server
 nx dev server              # Start server dev server
-nx run-many --target=dev   # Start both
+nx run-many --target=dev   # Start both applications
+```
 
-# Building
+#### Building
+```bash
 nx build client            # Build client for production
 nx build server            # Build server for production
-nx run-many --target=build # Build both
+nx run-many --target=build # Build both applications
+```
 
-# Testing
+#### Testing
+```bash
 nx test client             # Run client tests
 nx test server             # Run server tests
 nx test client --watch     # Watch mode
+```
 
-# Code Quality
+#### Code Quality
+```bash
 nx lint client             # Lint client code
 nx lint server             # Lint server code
-nx typecheck server        # TypeScript check
-
-# Utilities
-nx graph                   # View dependency graph
-nx reset                   # Clear Nx cache
 ```
 
 ### Testing Strategy
 
-#### Frontend Testing
-- **Unit Tests**: React Testing Library
-- **Component Tests**: Isolated component testing
-- **Integration Tests**: RTK Query mocking
-- **E2E Tests**: Cypress (future implementation)
+#### 1. **Frontend Testing**
+- Unit tests with Jest and React Testing Library
+- Component integration tests
+- RTK Query mocking for API calls
 
-#### Backend Testing
-- **Unit Tests**: Service and utility testing
-- **Integration Tests**: API endpoint testing
-- **Database Tests**: MongoDB memory server
-- **Performance Tests**: Load testing with k6
+#### 2. **Backend Testing**
+- Unit tests for services and utilities
+- Integration tests for API endpoints
+- Database tests with in-memory MongoDB
 
-### Code Quality Standards
+## Troubleshooting
 
-1. **TypeScript Configuration**
-   - Strict mode enabled
-   - No implicit any
-   - Consistent return types
+### Common Issues
 
-2. **ESLint Rules**
-   - Airbnb configuration base
-   - Custom rules for consistency
-   - Pre-commit hooks
+#### 1. **Redis Connection Issues**
+```bash
+# Check Redis connectivity
+docker exec -it <redis-container> redis-cli ping
 
-3. **Code Review Process**
-   - PR templates
-   - Automated checks
-   - Required approvals
+# Clear Redis cache
+docker exec -it <redis-container> redis-cli FLUSHALL
+```
 
-### CI/CD Pipeline
+#### 2. **MongoDB Connection Issues**
+```bash
+# Check MongoDB connectivity
+docker exec -it <mongo-container> mongosh --eval "db.adminCommand('ping')"
 
-1. **Continuous Integration**
-   ```yaml
-   - Lint checks
-   - TypeScript compilation
-   - Unit tests
-   - Integration tests
-   - Build verification
-   ```
+# View MongoDB logs
+docker logs <mongo-container>
+```
 
-2. **Continuous Deployment**
-   ```yaml
-   - Automated deployments to staging
-   - Manual promotion to production
-   - Rollback capabilities
-   - Health check validation
-   ```
+#### 3. **Build Issues**
+```bash
+# Clear Nx cache
+nx reset
 
-## Performance Considerations
+# Clear node_modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+```
 
-### Frontend Optimization
-1. **Next.js Optimizations**
-   - Automatic code splitting
-   - Image optimization
-   - Font optimization
-   - Static generation where possible
+#### 4. **API Issues**
+```bash
+# Check server logs
+docker logs <server-container>
 
-2. **Bundle Size Management**
-   - Tree shaking
-   - Dynamic imports
-   - Component lazy loading
+# Test API endpoints
+curl http://localhost:4000/api/v1/champions
+```
 
-### Backend Optimization
-1. **Database Optimization**
-   - Indexed queries
-   - Connection pooling
-   - Query optimization
+### Performance Issues
 
-2. **Caching Effectiveness**
-   - High cache hit rates (>90%)
-   - Appropriate TTLs
-   - Warm cache on startup
+#### 1. **Slow API Responses**
+- Check Redis cache hit rates
+- Verify database indexes
+- Monitor external API response times
 
-### Scalability Considerations
-1. **Horizontal Scaling**
-   - Stateless application design
-   - Session storage in Redis
-   - Database connection pooling
+#### 2. **High Memory Usage**
+- Monitor Node.js heap usage
+- Check for memory leaks in services
+- Optimize database queries
 
-2. **Vertical Scaling**
-   - Memory optimization
-   - CPU utilization monitoring
-   - Resource allocation tuning
+### Debugging Tips
+
+#### 1. **Enable Debug Logging**
+```bash
+LOG_LEVEL=debug npm run dev
+```
+
+#### 2. **Monitor Cache Performance**
+```bash
+# Redis cache statistics
+docker exec -it <redis-container> redis-cli INFO stats
+```
+
+#### 3. **Database Query Performance**
+```javascript
+// Enable MongoDB query logging
+mongoose.set('debug', true);
+```
+
+---
