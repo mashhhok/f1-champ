@@ -5,7 +5,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { useRenderCellContent } from '../../../src/components/races/hooks/useRenderCellContent';
 import { Race, TableColumn } from '../../../src/components/races/types';
-import '../../jest-globals';
 
 // Mock console.warn to test warning behavior
 const mockConsoleWarn = jest.spyOn(console, 'warn').mockImplementation(() => {});

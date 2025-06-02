@@ -3,7 +3,6 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import MUIThemeProvider from '../../src/components/helpers/MUIThemeProvider';
-import '../jest-globals';
 
 // Mock next-themes
 const mockUseTheme = jest.fn();

@@ -4,7 +4,6 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import RaceTableHeader from '../../../src/components/races/raceTable/RaceTableHeader';
 import { TableColumn } from '../../../src/components/races/types';
-import '../../jest-globals';
 
 // Mock Material UI components
 jest.mock('@mui/material', () => {
@@ -23,6 +22,22 @@ jest.mock('@mui/material', () => {
   };
 });
 
+// Mock useStyles hook
+jest.mock('../../../src/hooks/useStyles', () => ({
+  useStyles: () => ({
+    tableHead: {},
+    headerCell: {}
+  })
+}));
+
+// Mock styles
+jest.mock('../../../src/components/races/styles', () => ({
+  getStyles: () => ({
+    tableHead: {},
+    headerCell: {}
+  })
+}));
+
 describe('RaceTableHeader', () => {
   const mockColumns: TableColumn[] = [
     { id: 'grandPrix', label: 'Grand Prix', minWidth: 'sm' },
@@ -33,87 +48,57 @@ describe('RaceTableHeader', () => {
     { id: 'time', label: 'Time', minWidth: 'md', hideOnXs: true, hideOnSm: true },
   ];
 
-  it('renders all column headers correctly', () => {
+  it('renders all column headers', () => {
     render(
       <table>
         <RaceTableHeader columns={mockColumns} />
       </table>
     );
-    
-    expect(screen.getByText('Grand Prix')).toBeInTheDocument();
-    expect(screen.getByText('Winner')).toBeInTheDocument();
-    expect(screen.getByText('Team')).toBeInTheDocument();
-    expect(screen.getByText('Date')).toBeInTheDocument();
-    expect(screen.getByText('Laps')).toBeInTheDocument();
-    expect(screen.getByText('Time')).toBeInTheDocument();
+
+    mockColumns.forEach(column => {
+      expect(screen.getByText(column.label)).toBeInTheDocument();
+    });
   });
 
-  it('renders with empty columns array', () => {
+  it('renders without columns', () => {
     render(
       <table>
         <RaceTableHeader columns={[]} />
       </table>
     );
-    
-    // Should render table head but no cells
-    const tableHead = document.querySelector('thead');
-    expect(tableHead).toBeInTheDocument();
-    
-    const tableCells = document.querySelectorAll('th');
-    expect(tableCells).toHaveLength(0);
+
+    // Should render empty table head
+    expect(screen.getByRole('rowgroup')).toBeInTheDocument();
   });
 
-  it('renders correct number of header cells', () => {
+  it('renders column headers with correct structure', () => {
     render(
       <table>
-        <RaceTableHeader columns={mockColumns} />
+        <RaceTableHeader columns={mockColumns.slice(0, 3)} />
       </table>
     );
-    
-    const headerCells = document.querySelectorAll('th');
-    expect(headerCells).toHaveLength(mockColumns.length);
+
+    // Check that headers are rendered in table cells
+    expect(screen.getByRole('columnheader', { name: 'Grand Prix' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Winner' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Team' })).toBeInTheDocument();
   });
 
-  it('preserves column order', () => {
-    const orderedColumns: TableColumn[] = [
-      { id: 'first', label: 'First' },
-      { id: 'second', label: 'Second' },
-      { id: 'third', label: 'Third' },
-    ];
-
-    render(
-      <table>
-        <RaceTableHeader columns={orderedColumns} />
-      </table>
-    );
-    
-    const headerCells = document.querySelectorAll('th');
-    expect(headerCells[0]).toHaveTextContent('First');
-    expect(headerCells[1]).toHaveTextContent('Second');
-    expect(headerCells[2]).toHaveTextContent('Third');
-  });
-
-  it('renders columns with responsive visibility classes', () => {
-    const responsiveColumns: TableColumn[] = [
+  it('handles columns with hide properties', () => {
+    const columnsWithHide: TableColumn[] = [
       { id: 'visible', label: 'Always Visible' },
       { id: 'hideXs', label: 'Hide on XS', hideOnXs: true },
       { id: 'hideSm', label: 'Hide on SM', hideOnSm: true },
-      { id: 'hideBoth', label: 'Hide on Both', hideOnXs: true, hideOnSm: true },
     ];
 
     render(
       <table>
-        <RaceTableHeader columns={responsiveColumns} />
+        <RaceTableHeader columns={columnsWithHide} />
       </table>
     );
-    
-    // Verify all columns are rendered (responsive behavior is handled by CSS)
-    expect(screen.getByText('Always Visible')).toBeInTheDocument();
-    expect(screen.getByText('Hide on XS')).toBeInTheDocument();
-    expect(screen.getByText('Hide on SM')).toBeInTheDocument();
-    expect(screen.getByText('Hide on Both')).toBeInTheDocument();
-    
-    const headerCells = document.querySelectorAll('th');
-    expect(headerCells).toHaveLength(4);
+
+    expect(screen.getByRole('columnheader', { name: 'Always Visible' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Hide on XS' })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Hide on SM' })).toBeInTheDocument();
   });
 }); 

@@ -4,7 +4,6 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Header } from '../../src/components/ui/Header';
-import '../jest-globals';
 
 // Create a test theme for consistent testing
 const testTheme = createTheme({

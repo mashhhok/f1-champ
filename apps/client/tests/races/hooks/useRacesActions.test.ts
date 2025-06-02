@@ -1,7 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { useRacesActions } from '../../../src/components/races/hooks/useRacesActions';
 import { Race } from '../../../src/components/races/types';
-import '../../jest-globals.d.ts';
 
 // Mock Redux
 const mockDispatch = jest.fn();

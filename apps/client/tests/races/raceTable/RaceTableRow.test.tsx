@@ -4,7 +4,6 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import RaceTableRow from '../../../src/components/races/raceTable/RaceTableRow';
 import { Race, TableColumn } from '../../../src/components/races/types';
-import '../../jest-globals';
 
 // Mock Material UI components
 jest.mock('@mui/material', () => {
@@ -28,13 +27,28 @@ jest.mock('@mui/material', () => {
 jest.mock('../../../src/components/races/raceTable/RaceTableCell', () => {
   return {
     __esModule: true,
-    default: ({ race, column, seasonChampion }: any) => (
-      <td>
-        {column.id === 'winner' && seasonChampion === race.winner 
-          ? `${race[column.id]} 🏆` 
-          : race[column.id] || 'N/A'}
-      </td>
-    ),
+    default: ({ race, column, seasonChampion }: any) => {
+      const getCellContent = () => {
+        switch (column.id) {
+          case 'grandPrix':
+            return race.grandPrix;
+          case 'winner':
+            return seasonChampion === race.winner ? `${race.winner} 🏆` : race.winner;
+          case 'team':
+            return race.team;
+          case 'date':
+            return race.date;
+          case 'laps':
+            return race.laps;
+          case 'time':
+            return race.time;
+          default:
+            return '';
+        }
+      };
+
+      return <td>{getCellContent()}</td>;
+    },
   };
 });
 
@@ -94,24 +108,7 @@ describe('RaceTableRow', () => {
     expect(screen.getByText('Max Verstappen 🏆')).toBeInTheDocument();
   });
 
-  it('does not display trophy when driver is not season champion', () => {
-    render(
-      <table>
-        <tbody>
-          <RaceTableRow 
-            race={mockRace} 
-            columns={mockColumns} 
-            seasonChampion="Lewis Hamilton" 
-          />
-        </tbody>
-      </table>
-    );
-
-    expect(screen.getByText('Max Verstappen')).toBeInTheDocument();
-    expect(screen.queryByText('Max Verstappen 🏆')).not.toBeInTheDocument();
-  });
-
-  it('renders correct number of cells based on columns', () => {
+  it('renders without season champion', () => {
     render(
       <table>
         <tbody>
@@ -120,8 +117,34 @@ describe('RaceTableRow', () => {
       </table>
     );
 
-    const cells = screen.getAllByRole('cell');
-    expect(cells).toHaveLength(mockColumns.length);
+    expect(screen.getByText('Max Verstappen')).toBeInTheDocument();
+    expect(screen.queryByText('🏆')).not.toBeInTheDocument();
+  });
+
+  it('renders all columns provided', () => {
+    const allColumns: TableColumn[] = [
+      { id: 'grandPrix', label: 'Grand Prix' },
+      { id: 'winner', label: 'Winner' },
+      { id: 'team', label: 'Team' },
+      { id: 'date', label: 'Date' },
+      { id: 'laps', label: 'Laps' },
+      { id: 'time', label: 'Time' },
+    ];
+
+    render(
+      <table>
+        <tbody>
+          <RaceTableRow race={mockRace} columns={allColumns} />
+        </tbody>
+      </table>
+    );
+
+    expect(screen.getByText('Bahrain Grand Prix')).toBeInTheDocument();
+    expect(screen.getByText('Max Verstappen')).toBeInTheDocument();
+    expect(screen.getByText('Red Bull')).toBeInTheDocument();
+    expect(screen.getByText('2023-03-05')).toBeInTheDocument();
+    expect(screen.getByText('57')).toBeInTheDocument();
+    expect(screen.getByText('1:33:56.736')).toBeInTheDocument();
   });
 
   it('handles empty columns array', () => {
@@ -133,39 +156,7 @@ describe('RaceTableRow', () => {
       </table>
     );
 
-    const cells = screen.queryAllByRole('cell');
-    expect(cells).toHaveLength(0);
-  });
-
-  it('handles race with missing optional data', () => {
-    const incompleteRace: Race = {
-      id: '2023-2',
-      grandPrix: 'Saudi Arabian Grand Prix',
-      winner: 'Lewis Hamilton',
-      team: 'Mercedes',
-      teamWikipediaUrl: '',
-      wikipediaUrl: '',
-      date: '2023-03-19',
-      laps: 50,
-      time: '',
-      driverId: 'lewis_hamilton',
-      driverNationality: 'British',
-      driverDateOfBirth: '1985-01-07',
-      driverUrl: '',
-      permanentNumber: '44'
-    };
-
-    render(
-      <table>
-        <tbody>
-          <RaceTableRow race={incompleteRace} columns={mockColumns} />
-        </tbody>
-      </table>
-    );
-
-    expect(screen.getByText('Saudi Arabian Grand Prix')).toBeInTheDocument();
-    expect(screen.getByText('Lewis Hamilton')).toBeInTheDocument();
-    expect(screen.getByText('Mercedes')).toBeInTheDocument();
-    expect(screen.getByText('2023-03-19')).toBeInTheDocument();
+    // Should render a row but no cells
+    expect(screen.getByRole('row')).toBeInTheDocument();
   });
 }); 

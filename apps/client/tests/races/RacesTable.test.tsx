@@ -3,7 +3,6 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import RacesTable from '../../src/components/races/RacesTable';
 import { Race } from '../../src/components/races/types';
-import '../jest-globals';
 
 // Mock Material UI components
 jest.mock('@mui/material', () => {
@@ -38,6 +37,18 @@ jest.mock('../../src/components/driver', () => {
   };
 });
 
+// Mock useStyles hook
+jest.mock('../../src/hooks/useStyles', () => ({
+  useStyles: () => ({
+    tableContainer: {},
+    tableHead: {},
+    headerCell: {},
+    bodyCell: {},
+    winnerCell: {},
+    modal: {}
+  })
+}));
+
 // Mock Redux hooks with dynamic state
 let mockReduxState: {
   selectedDriver: string | null;
@@ -58,19 +69,8 @@ const mockSelectDriver = jest.fn((driverName: string) => {
 jest.mock('react-redux', () => ({
   useDispatch: () => mockDispatch,
   useSelector: (selector: any) => {
-    if (selector.toString().includes('selectDriverModalState')) {
-      return {
-        isOpen: mockReduxState.isDriverModalOpen,
-        driverInfo: mockReduxState.selectedDriver ? {
-          name: 'Max',
-          surname: 'Verstappen',
-          team: 'Red Bull',
-          nationality: 'Dutch',
-          dateOfBirth: '1997-09-30',
-          wikipediaUrl: 'https://en.wikipedia.org/wiki/Max_Verstappen',
-          permanentNumber: '33'
-        } : null
-      };
+    if (selector.toString().includes('selectRacesState')) {
+      return mockReduxState;
     }
     return mockReduxState;
   },

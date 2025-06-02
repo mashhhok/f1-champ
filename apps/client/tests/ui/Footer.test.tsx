@@ -4,7 +4,6 @@ import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Footer } from '../../src/components/ui/Footer';
-import '../jest-globals';
 
 // Create test themes for consistent testing
 const lightTheme = createTheme({

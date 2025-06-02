@@ -3,7 +3,6 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import PageProvider from '../../src/components/helpers/PageProvider';
-import '../jest-globals';
 
 // Mock next-themes
 jest.mock('next-themes', () => ({
