@@ -56,7 +56,7 @@ export const f1Api = createApi({
       query: (season) => `/v1/${season}/race-winners`,
       providesTags: ['Races'],
       transformResponse: (response: RaceResponse[]) => {
-        return response.flatMap(driver => 
+        const races = response.flatMap(driver => 
           driver.race.map(race => ({
             id: `${driver.driverId}-${race.raceName}`,
             grandPrix: race.raceName,
@@ -75,6 +75,13 @@ export const f1Api = createApi({
             permanentNumber: driver.permanentNumber
           }))
         );
+        
+        // Sort races by date (chronological order) at API level for production
+        return races.sort((a, b) => {
+          const dateA = new Date(a.date);
+          const dateB = new Date(b.date);
+          return dateA.getTime() - dateB.getTime();
+        });
       }
     }),
   }),
