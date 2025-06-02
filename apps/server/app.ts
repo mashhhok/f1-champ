@@ -5,7 +5,7 @@ import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import { environment } from "./config/environment";
 import { driversRouter } from "./routes/drivers";
-// import { setupSwagger } from "./swagger";
+import { setupSwagger } from "./swagger";
 import { errorHandler } from "./middleware/errorHandler";
 import { logger, morganStream } from "./utils/logger";
 
@@ -85,10 +85,10 @@ app.use(morgan(environment.NODE_ENV === 'production' ? 'combined' : 'dev', {
 // Remove fingerprinting headers
 app.disable('x-powered-by');
 
-// Uncomment to enable Swagger in development
-// if (environment.NODE_ENV === 'development') {
-//   setupSwagger(app);
-// }
+// Swagger API Documentation
+if (environment.NODE_ENV === 'development') {
+  setupSwagger(app);
+}
 
 // Health check endpoint for Railway
 app.get("/api/health", (_req, res) => {
