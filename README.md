@@ -5,6 +5,7 @@
 A full-stack F1 Championship application built with Next.js, Express.js, MongoDB, and Redis in an Nx monorepo.
 
 Client: https://client-production-adf9.up.railway.app/
+
 Server (as example): https://server-production-9fd8.up.railway.app/api/v1/champions
 
 ## 🏎️ Project Overview
