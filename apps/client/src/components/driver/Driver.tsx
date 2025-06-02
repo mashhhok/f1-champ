@@ -8,24 +8,38 @@ import {
   CardActions,
   Button,
   Typography,
-  Box
+  Box,
+  Alert
 } from "@mui/material";
-import { DriverProps } from "./types"
 import f1LogoRed from '../../assets/images/f1_logo_red.svg'
 import { getStyles, formatDate } from './styles';
 import DriverInfo from './DriverInfo';
 import { useStyles } from '../../hooks/useStyles';
+import { useDriverData } from './hooks';
 
-const Driver = ({
-  name, 
-  surname,
-  nationality, 
-  dateOfBirth, 
-  wikipediaUrl,
-  permanentNumber,
-  team
-}: DriverProps) => {
+const Driver = () => {
   const styles = useStyles(getStyles);
+  const driverInfo = useDriverData();
+
+  if (!driverInfo) {
+    return (
+      <Box sx={{ p: 4 }}>
+        <Alert severity="error">
+          Driver information not available. Please select a driver from the races table.
+        </Alert>
+      </Box>
+    );
+  }
+
+  const {
+    name, 
+    surname,
+    nationality, 
+    dateOfBirth, 
+    wikipediaUrl,
+    permanentNumber,
+    team
+  } = driverInfo;
 
   return (
     <Card sx={styles.card}>

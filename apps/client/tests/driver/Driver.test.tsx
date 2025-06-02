@@ -2,145 +2,160 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
 
 const testTheme = createTheme();
 
-jest.mock('../../src/components/driver', () => ({
-  __esModule: true,
-  default: ({ name, surname, permanentNumber, nationality, dateOfBirth, wikipediaUrl, imageUrl, team }: any) => (
-    <div>
-      <h5>{name} {surname}</h5>
-      <p>#{permanentNumber}</p>
-      <img src={imageUrl} alt={`${name} ${surname}`} />
-      <div>
-        <p><strong>Team - </strong> {team}</p>
-        <p><strong>Nationality - </strong> {nationality}</p>
-        <p><strong>Date of Birth - </strong> {new Date(dateOfBirth).toLocaleDateString()}</p>
-      </div>
-      <a href={wikipediaUrl} target="_blank" rel="noopener noreferrer">
-        Read more on Wikipedia
-      </a>
-    </div>
-  )
+// Mock Redux slice
+const mockRacesSlice = {
+  name: 'races',
+  initialState: {
+    selectedDriver: null,
+    isDriverModalOpen: false,
+    allRaces: []
+  },
+  reducers: {}
+};
+
+// Create mock store
+const createMockStore = (driverInfo: any = null) => {
+  return configureStore({
+    reducer: {
+      races: (state = mockRacesSlice.initialState) => state
+    },
+    preloadedState: {
+      races: {
+        ...mockRacesSlice.initialState,
+        selectedDriver: driverInfo ? 'Mock Driver' : null,
+        allRaces: driverInfo ? [{
+          winner: 'Mock Driver',
+          driverNationality: driverInfo.nationality,
+          driverDateOfBirth: driverInfo.dateOfBirth,
+          driverUrl: driverInfo.wikipediaUrl,
+          permanentNumber: driverInfo.permanentNumber,
+          team: driverInfo.team
+        }] : []
+      }
+    }
+  });
+};
+
+// Mock the selectDriverInfo selector
+jest.mock('../../src/redux/slices/racesSlice', () => ({
+  selectDriverInfo: (state: any) => {
+    const selectedDriver = state.races.selectedDriver;
+    if (!selectedDriver || state.races.allRaces.length === 0) return null;
+    
+    const race = state.races.allRaces[0];
+    const [firstName, ...lastNameParts] = selectedDriver.split(' ');
+    
+    return {
+      name: firstName,
+      surname: lastNameParts.join(' '),
+      nationality: race.driverNationality,
+      dateOfBirth: race.driverDateOfBirth,
+      wikipediaUrl: race.driverUrl,
+      permanentNumber: race.permanentNumber,
+      team: race.team,
+      imageUrl: ''
+    };
+  }
 }));
 
 import Driver from '../../src/components/driver';
 
-describe('Driver Component', () => {
-  const mockDriverProps = {
+describe('Driver Component (Redux Connected)', () => {
+  const mockDriverData = {
     name: 'Max',
     surname: 'Verstappen',
     permanentNumber: '33',
     nationality: 'Dutch',
     dateOfBirth: '1997-09-30',
     wikipediaUrl: 'https://en.wikipedia.org/wiki/Max_Verstappen',
-    imageUrl: 'https://example.com/max.png',
     team: 'Red Bull Racing'
   };
 
-  const renderWithTheme = (component: React.ReactElement) => {
+  const renderWithRedux = (driverInfo: any = null) => {
+    const store = createMockStore(driverInfo);
     return render(
-      <ThemeProvider theme={testTheme}>
-        {component}
-      </ThemeProvider>
+      <Provider store={store}>
+        <ThemeProvider theme={testTheme}>
+          <Driver />
+        </ThemeProvider>
+      </Provider>
     );
   };
 
-  describe('Driver Name and Number', () => {
-    it('renders driver full name correctly', () => {
-      renderWithTheme(<Driver {...mockDriverProps} />);
+  describe('Driver Data from Redux', () => {
+    it('renders driver information when available in Redux store', () => {
+      renderWithRedux(mockDriverData);
       
       expect(screen.getByText('Max Verstappen')).toBeInTheDocument();
-    });
-
-    it('renders driver permanent number with hash prefix', () => {
-      renderWithTheme(<Driver {...mockDriverProps} />);
-      
       expect(screen.getByText('#33')).toBeInTheDocument();
-    });
-  });
-
-  describe('Driver Image', () => {
-    it('renders driver image with correct src and alt attributes', () => {
-      renderWithTheme(<Driver {...mockDriverProps} />);
-      
-      const image = screen.getByAltText('Max Verstappen');
-      expect(image).toBeInTheDocument();
-      expect(image).toHaveAttribute('src', 'https://example.com/max.png');
-    });
-  });
-
-  describe('Driver Information', () => {
-    it('renders team information', () => {
-      renderWithTheme(<Driver {...mockDriverProps} />);
-      
-      expect(screen.getByText('Team -')).toBeInTheDocument();
       expect(screen.getByText('Red Bull Racing')).toBeInTheDocument();
-    });
-
-    it('renders nationality information', () => {
-      renderWithTheme(<Driver {...mockDriverProps} />);
-      
-      expect(screen.getByText('Nationality -')).toBeInTheDocument();
       expect(screen.getByText('Dutch')).toBeInTheDocument();
     });
 
-    it('renders date of birth information', () => {
-      renderWithTheme(<Driver {...mockDriverProps} />);
+    it('renders error message when no driver data is available', () => {
+      renderWithRedux(null);
+      
+      expect(screen.getByText(/Driver information not available/)).toBeInTheDocument();
+      expect(screen.getByText(/Please select a driver from the races table/)).toBeInTheDocument();
+    });
+  });
+
+  describe('Driver Information Display', () => {
+    it('displays team information correctly', () => {
+      renderWithRedux(mockDriverData);
+      
+      expect(screen.getByText(/Team/)).toBeInTheDocument();
+      expect(screen.getByText('Red Bull Racing')).toBeInTheDocument();
+    });
+
+    it('displays nationality information correctly', () => {
+      renderWithRedux(mockDriverData);
+      
+      expect(screen.getByText(/Nationality/)).toBeInTheDocument();
+      expect(screen.getByText('Dutch')).toBeInTheDocument();
+    });
+
+    it('displays date of birth information correctly', () => {
+      renderWithRedux(mockDriverData);
       
       expect(screen.getByText(/Date of Birth/)).toBeInTheDocument();
     });
   });
 
   describe('Wikipedia Link', () => {
-    it('renders Wikipedia link with correct href attribute', () => {
-      renderWithTheme(<Driver {...mockDriverProps} />);
+    it('renders Wikipedia link with correct href when driver data exists', () => {
+      renderWithRedux(mockDriverData);
       
-      const wikiLink = screen.getByRole('link', { name: 'Read more on Wikipedia' });
+      const wikiLink = screen.getByRole('link', { name: /Read more on Wikipedia/i });
       expect(wikiLink).toHaveAttribute('href', 'https://en.wikipedia.org/wiki/Max_Verstappen');
-    });
-
-    it('opens Wikipedia link in new tab', () => {
-      renderWithTheme(<Driver {...mockDriverProps} />);
-      
-      const wikiLink = screen.getByRole('link', { name: 'Read more on Wikipedia' });
       expect(wikiLink).toHaveAttribute('target', '_blank');
       expect(wikiLink).toHaveAttribute('rel', 'noopener noreferrer');
     });
   });
 
   describe('Different Driver Data', () => {
-    it('renders with different driver props', () => {
-      const hamiltonProps = {
+    it('renders with different driver data from Redux', () => {
+      const hamiltonData = {
         name: 'Lewis',
         surname: 'Hamilton',
         permanentNumber: '44',
         nationality: 'British',
         dateOfBirth: '1985-01-07',
         wikipediaUrl: 'https://en.wikipedia.org/wiki/Lewis_Hamilton',
-        imageUrl: 'https://example.com/lewis.png',
         team: 'Mercedes-AMG Petronas'
       };
 
-      renderWithTheme(<Driver {...hamiltonProps} />);
+      renderWithRedux(hamiltonData);
       
       expect(screen.getByText('Lewis Hamilton')).toBeInTheDocument();
       expect(screen.getByText('#44')).toBeInTheDocument();
-      expect(screen.getByAltText('Lewis Hamilton')).toBeInTheDocument();
-      expect(screen.getByText('Team -')).toBeInTheDocument();
       expect(screen.getByText('Mercedes-AMG Petronas')).toBeInTheDocument();
-      expect(screen.getByText('Nationality -')).toBeInTheDocument();
       expect(screen.getByText('British')).toBeInTheDocument();
-    });
-  });
-
-  describe('Component Structure', () => {
-    it('renders all required elements', () => {
-      renderWithTheme(<Driver {...mockDriverProps} />);
-      
-      expect(screen.getByRole('heading', { level: 5 })).toBeInTheDocument();
-      expect(screen.getByRole('img')).toBeInTheDocument();
-      expect(screen.getByRole('link')).toBeInTheDocument();
     });
   });
 }); 
