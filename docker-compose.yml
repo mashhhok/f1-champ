@@ -86,8 +86,27 @@ services:
       retries: 3
       start_period: 40s
 
-  # Development Tools (optional)
-  # Redis GUI (optional)
+  # Development Tools (use --profile dev to enable)
+
+  # Mongo Express GUI
+  mongo-express:
+    image: mongo-express:latest
+    container_name: f1-mongo-express
+    restart: unless-stopped
+    ports:
+      - "8080:8081"
+    environment:
+      ME_CONFIG_OPTIONS_EDITORTHEME: ambianced
+      ME_CONFIG_MONGODB_URL: mongodb://f1admin:f1password@mongodb:27017/f1-champions?authSource=admin
+      ME_CONFIG_BASICAUTH_ENABLED: "false"
+    depends_on:
+      - mongodb
+    networks:
+      - f1-network
+    profiles:
+      - dev
+  
+  # Redis GUI
   redis-commander:
     image: rediscommander/redis-commander:latest
     container_name: f1-redis-commander
