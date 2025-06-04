@@ -47,7 +47,8 @@ cd apps/server
 npm run dev
 
 # Start the client (development mode)
-npx nx dev client
+cd apps/client
+npx next dev
 
 # Run tests
 npm test
