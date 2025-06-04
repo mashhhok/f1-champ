@@ -13,17 +13,23 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig*.json ./
 
-# Copy server package files - FLAT STRUCTURE
-COPY apps/server/package*.json ./
-COPY apps/server/tsconfig.json ./
+# Copy server package files
+COPY apps/server/package*.json ./apps/server/
+COPY apps/server/tsconfig.json ./apps/server/
+
+# Copy shared types library
+COPY libs/shared-types ./libs/shared-types
 
 # Install all dependencies (including devDependencies)
 RUN npm ci --frozen-lockfile
 
-# Copy server source code - FLAT STRUCTURE  
-COPY apps/server/ ./
+# Copy server source code
+COPY apps/server/ ./apps/server/
 
-# Build the TypeScript application (we're already in the right directory)
+# Change to server directory for build
+WORKDIR /app/apps/server
+
+# Build the TypeScript application
 RUN npm run build
 
 # =============================================================================
@@ -41,15 +47,15 @@ WORKDIR /app
 # Copy root package files (including package-lock.json)
 COPY package*.json ./
 
-# Copy server package files - FLAT STRUCTURE
-COPY apps/server/package*.json ./
+# Copy server package files
+COPY apps/server/package*.json ./apps/server/
 
 # Install only production dependencies
 RUN npm ci --frozen-lockfile --omit=dev && \
     npm cache clean --force
 
-# Copy built application from builder stage - FLAT STRUCTURE
-COPY --from=builder /app/dist ./dist
+# Copy built application from builder stage
+COPY --from=builder /app/apps/server/dist ./apps/server/dist
 
 # Change ownership to non-root user
 RUN chown -R nodeuser:nodejs /app
@@ -66,4 +72,5 @@ EXPOSE 4000
 ENV NODE_ENV=production
 
 # Start the server
-CMD ["node", "dist/server.js"]
+WORKDIR /app/apps/server
+CMD ["node", "./dist/server.js"]

@@ -1,4 +1,4 @@
-import { F1ApiResponse, DriverStanding } from "../controllers/types";
+import { F1ApiResponse, DriverStanding } from '@f1-champ/shared-types';
 import { redisClient } from "../utils/redisClient";
 import { fetchWithRetry } from "../utils/fetchRetryFunction";
 import SeasonWinner, { ISeasonWinner } from "../models/seasonWinner";
@@ -82,11 +82,13 @@ export class SeasonChampionsService {
     const data = await fetchWithRetry<F1ApiResponse>(url);
     if (!data) return null;
 
-    const standings = data.MRData.StandingsTable.StandingsLists;
+    const standingsTable = data.MRData.StandingsTable;
+    if (!standingsTable) return null;
+    const standings = standingsTable.StandingsLists;
     if (!standings || standings.length === 0) return null;
+    const latestRace = parseInt(standings[0].round);
 
     const currentYear = new Date().getFullYear();
-    const latestRace = parseInt(data.MRData.StandingsTable.round);
     let isSeasonEnded = true;
     
     if (year === currentYear) {

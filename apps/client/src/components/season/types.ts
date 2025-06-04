@@ -1,11 +1,4 @@
-import { Race } from '../races/types';
-
-// Interface for season champion data
-export interface SeasonChampion {
-  year: number;
-  champion: string;
-  isSeasonEnded: boolean;
-}
+import { Race, SeasonChampion } from '@f1-champ/shared-types';
 
 // Interface for SeasonRow component props
 export interface SeasonRowProps {

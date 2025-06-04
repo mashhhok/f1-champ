@@ -12,7 +12,7 @@ import {
   Alert
 } from "@mui/material";
 import { Fragment, useEffect } from "react";
-import { SeasonChampion } from "./types";
+import { SeasonChampion } from '@f1-champ/shared-types';
 import { getStyles } from './styles';
 import { useStyles } from '../../hooks/useStyles';
 import { useGetSeasonsQuery, useGetRaceWinnersQuery } from "../../redux/f1api/f1api";

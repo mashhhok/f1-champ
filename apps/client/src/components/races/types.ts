@@ -1,20 +1,6 @@
-// Race interface for Formula 1 race data
-export interface Race {
-  id: string;
-  grandPrix: string;
-  wikipediaUrl: string;
-  winner: string;
-  team: string;
-  teamWikipediaUrl: string;
-  date: string;
-  laps: number;
-  time: string;
-  driverId: string;
-  driverNationality: string;
-  driverDateOfBirth: string;
-  driverUrl: string;
-  permanentNumber: string;
-}
+import { Race } from '@f1-champ/shared-types';
+
+// Removed local Race interface (using shared Race from @f1-champ/shared-types)
 
 export interface RacesTableProps {
   races: Race[];

@@ -8,7 +8,7 @@
   "include": [
     "next-env.d.ts",
     "src/**/*.js",
-    "src/**/*.jsx", 
+    "src/**/*.jsx",
     "src/**/*.ts",
     "src/**/*.tsx",
     ".next/types/**/*.ts"
@@ -24,5 +24,10 @@
     "**/*.spec.*",
     "jest.config.ts",
     "eslint.config.*"
+  ],
+  "references": [
+    {
+      "path": "../../libs/shared-types/tsconfig.lib.json"
+    }
   ]
 }

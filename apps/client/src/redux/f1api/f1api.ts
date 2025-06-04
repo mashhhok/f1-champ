@@ -1,40 +1,35 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { SeasonChampion } from '../../components/season/types';
-import { Race } from '../../components/races/types';
+import { 
+  SeasonChampion, 
+  Race, 
+  ChampionResponse,
+  RaceWinnerResponse 
+} from '@f1-champ/shared-types';
 import getConfig from 'next/config';
-
-// Type for the backend champion response
-interface ChampionResponse {
-  season: string;
-  givenName: string;
-  familyName: string;
-  isSeasonEnded: boolean;
-}
-
-// Type for the backend race response (matches IDriver from backend)
-interface RaceResponse {
-  driverId: string;
-  race: {
-    raceName: string;
-    raceUrl: string;
-    raceDate: string;
-  }[];
-  season: string;
-  givenName: string;
-  familyName: string;
-  dateOfBirth: string;
-  nationality: string;
-  permanentNumber: string;
-  driverUrl: string;
-  teamName: string;
-  teamUrl: string;
-  laps: string;
-  time: string;
-}
 
 // Get runtime configuration
 const { publicRuntimeConfig } = getConfig() || {};
 const API_BASE_URL = publicRuntimeConfig?.apiUrl || process.env.NEXT_PUBLIC_API_URL;
+
+// Add type mapper for RaceWinnerResponse to Race[]
+const mapRaceResponseToRace = (response: RaceWinnerResponse): Race[] => {
+  return response.races.map(race => ({
+    id: `${response.driverId}-${race.raceName}`,
+    grandPrix: race.raceName ?? '',
+    wikipediaUrl: race.raceUrl ?? '',
+    date: race.raceDate ?? '',
+    winner: `${response.givenName ?? ''} ${response.familyName ?? ''}`.trim(),
+    driverId: response.driverId ?? '',
+    driverNationality: response.nationality ?? '',
+    driverDateOfBirth: response.dateOfBirth ?? '',
+    driverUrl: response.wikipediaUrl ?? '',
+    permanentNumber: response.permanentNumber ?? '',
+    team: race.teamName ?? '',
+    teamWikipediaUrl: race.teamUrl ?? '',
+    laps: race.laps ?? '0',
+    time: race.time ?? ''
+  }));
+};
 
 export const f1Api = createApi({
   reducerPath: 'f1',
@@ -46,8 +41,8 @@ export const f1Api = createApi({
       providesTags: ['Seasons'],
       transformResponse: (response: ChampionResponse[]) => {
         return response.map(champion => ({
-          year: parseInt(champion.season),
-          champion: `${champion.givenName} ${champion.familyName}`,
+          year: champion.year,
+          champion: champion.champion,
           isSeasonEnded: champion.isSeasonEnded
         }));
       }
@@ -55,26 +50,8 @@ export const f1Api = createApi({
     getRaceWinners: builder.query<Race[], number>({
       query: (season) => `/v1/${season}/race-winners`,
       providesTags: ['Races'],
-      transformResponse: (response: RaceResponse[]) => {
-        const races = response.flatMap(driver => 
-          driver.race.map(race => ({
-            id: `${driver.driverId}-${race.raceName}`,
-            grandPrix: race.raceName,
-            wikipediaUrl: race.raceUrl,
-            winner: `${driver.givenName} ${driver.familyName}`,
-            team: driver.teamName,
-            teamWikipediaUrl: driver.teamUrl,
-            date: race.raceDate,
-            laps: parseInt(driver.laps),
-            time: driver.time,
-            // Store additional driver info for modal
-            driverId: driver.driverId,
-            driverNationality: driver.nationality,
-            driverDateOfBirth: driver.dateOfBirth,
-            driverUrl: driver.driverUrl,
-            permanentNumber: driver.permanentNumber
-          }))
-        );
+      transformResponse: (response: RaceWinnerResponse[]) => {
+        const races = response.flatMap(driver => mapRaceResponseToRace(driver));
         
         // Sort races by date (chronological order) at API level for production
         return races.sort((a, b) => {
