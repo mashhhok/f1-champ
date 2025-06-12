@@ -49,9 +49,6 @@ services:
     depends_on:
       - mongodb
       - redis
-    volumes:
-      - ./apps/server:/app
-      - /app/node_modules
     networks:
       - f1-network
     healthcheck:
